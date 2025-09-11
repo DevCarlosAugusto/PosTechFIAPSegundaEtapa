@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Serviço da sua aplicação Express
+  app:
+    build: . # Indica que o Dockerfile está na raiz do projeto
+    container_name: meu-express-app
+    ports:
+      - "3000:3000" # Mapeia a porta 3000 do host para a porta 3000 do contêiner
+    depends_on:
+      - postgres
+      - mongo
+      - mysql
+    environment:
+      # Variáveis de ambiente para conexão com os bancos de dados
+      # Adapte os nomes, usuários, senhas e bancos de dados conforme necessário
+      DATABASE_URL_POSTGRES: postgresql://user_pg:password_pg@postgres:5432/db_pg
+      DATABASE_URL_MONGO: mongodb://user_mongo:password_mongo@mongo:27017/db_mongo
+      DATABASE_URL_MYSQL: mysql://user_mysql:password_mysql@mysql:3306/db_mysql
+    networks:
+      - app-network
+
+  # Serviço do PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: meu-postgres
+    environment:
+      POSTGRES_USER: user_pg
+      POSTGRES_PASSWORD: password_pg
+      POSTGRES_DB: db_pg
+    ports:
+      - "5432:5432" # Opcional: Mapeia a porta se precisar acessá-la externamente
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Serviço do MongoDB
+  mongo:
+    image: mongo:7-alpine
+    container_name: meu-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user_mongo
+      MONGO_INITDB_ROOT_PASSWORD: password_mongo
+      MONGO_INITDB_DATABASE: db_mongo
+    ports:
+      - "27017:27017" # Opcional: Mapeia a porta se precisar acessá-la externamente
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  # Serviço do MySQL
+  mysql:
+    image: mysql:8-debian
+    container_name: meu-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password_mysql
+      MYSQL_DATABASE: db_mysql
+      MYSQL_USER: user_mysql
+      MYSQL_PASSWORD: password_mysql
+    ports:
+      - "3306:3306" # Opcional: Mapeia a porta se precisar acessá-la externamente
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+# Definição das redes e volumes
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongo_data:
+  mysql_data:
