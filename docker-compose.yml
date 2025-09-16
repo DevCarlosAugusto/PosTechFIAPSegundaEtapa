@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   # Serviço da sua aplicação Express
   app:
     build: . # Indica que o Dockerfile está na raiz do projeto
-    container_name: meu-express-app
+    container_name: PosTechFiapSegundaEtapa
     ports:
       - "3000:3000" # Mapeia a porta 3000 do host para a porta 3000 do contêiner
     depends_on:
@@ -17,19 +15,20 @@ services:
       DATABASE_URL_POSTGRES: postgresql://user_pg:password_pg@postgres:5432/db_pg
       DATABASE_URL_MONGO: mongodb://user_mongo:password_mongo@mongo:27017/db_mongo
       DATABASE_URL_MYSQL: mysql://user_mysql:password_mysql@mysql:3306/db_mysql
+      NODE_ENV: development # Ou production, dependendo do seu caso
     networks:
       - app-network
 
   # Serviço do PostgreSQL
   postgres:
-    image: postgres:16-alpine
-    container_name: meu-postgres
+    image: postgres:latest
+    container_name: volume-postgresql
     environment:
       POSTGRES_USER: user_pg
       POSTGRES_PASSWORD: password_pg
       POSTGRES_DB: db_pg
     ports:
-      - "5432:5432" # Opcional: Mapeia a porta se precisar acessá-la externamente
+      - "5433:5432" # Opcional: Mapeia a porta se precisar acessá-la externamente
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -37,8 +36,8 @@ services:
 
   # Serviço do MongoDB
   mongo:
-    image: mongo:7-alpine
-    container_name: meu-mongo
+    image: mongo:latest
+    container_name: volume-mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: user_mongo
       MONGO_INITDB_ROOT_PASSWORD: password_mongo
@@ -52,15 +51,15 @@ services:
 
   # Serviço do MySQL
   mysql:
-    image: mysql:8-debian
-    container_name: meu-mysql
+    image: mysql:latest
+    container_name: volume-mysql
     environment:
       MYSQL_ROOT_PASSWORD: password_mysql
       MYSQL_DATABASE: db_mysql
       MYSQL_USER: user_mysql
       MYSQL_PASSWORD: password_mysql
     ports:
-      - "3306:3306" # Opcional: Mapeia a porta se precisar acessá-la externamente
+      - "3307:3306" # Opcional: Mapeia a porta se precisar acessá-la externamente
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
