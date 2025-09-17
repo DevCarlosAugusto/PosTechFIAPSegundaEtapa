@@ -7,7 +7,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE ${APP_PORT}
 
-# Comando para rodar a aplicação quando o contêiner iniciar
 CMD ["npm", "start"]
