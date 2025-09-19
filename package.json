@@ -5,9 +5,11 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "npm run lint && nodemon src/server.js",
+    "dev": "nodemon --exec 'npm run dev:watch'",
+    "dev:watch": "npm run lint && npm run test && node src/index.js",
     "jsdocs": "jsdoc /src -r",
     "lint": "eslint . --ext .js",
+    "test": "vitest",
     "start": "node src/server.js"
   },
   "dependencies": {
@@ -29,6 +31,8 @@
     "eslint": "^9.36.0",
     "globals": "^16.4.0",
     "jsdoc": "^4.0.4",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
+    "vitest": "^3.2.4"
   }
 }
