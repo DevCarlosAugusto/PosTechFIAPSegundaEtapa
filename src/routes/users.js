@@ -2,9 +2,7 @@ import express from 'express';
 
 let router = express.Router();
 
-router.get('/', function(req, res) {
-	res.render('index', { title: 'Express' });
-
+router.get('/', (req, res) => {
 	res.json({
 		message: 'User Routes',
 		version: '0.1.1',
