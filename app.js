@@ -9,21 +9,19 @@ import { dirname } from 'path';
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
 
-// Obtenha o caminho do diretório atual
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 let app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'src/public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
