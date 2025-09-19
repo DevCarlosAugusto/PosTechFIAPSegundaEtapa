@@ -1,0 +1,7 @@
+{
+  "delay": 450,
+  "ext": "js,json,hbs",
+  "exec": "node ./src/index.js",
+  "ignore": ["node_modules", "dist"],
+  "watch": ["src"]
+}
