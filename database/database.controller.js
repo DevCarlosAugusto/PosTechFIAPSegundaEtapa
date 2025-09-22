@@ -82,22 +82,20 @@ function stripPsqlMetaCommands(sqlText) {
   for (let ln of lines) {
     const t = ln.trim();
 
-    // pula qualquer linha de metacomando do psql
     if (t.startsWith("\\connect") || t.startsWith("\\")) continue;
 
-    // se encontrar o bloco condicional de criação de DB, pula ele todo
     if (/^SELECT\s+'CREATE DATABASE/i.test(t)) {
       skipCreateDbBlock = true;
       continue;
     }
     if (skipCreateDbBlock) {
       if (t.includes("\\gexec")) {
-        skipCreateDbBlock = false; // acabou o bloco
+        skipCreateDbBlock = false; 
       }
-      continue; // pula enquanto o bloco não terminar
+      continue; 
     }
 
-    // mantém as outras linhas
+   
     out.push(ln);
   }
 
@@ -164,15 +162,10 @@ async function runSqlFileIdempotent(scriptPath, targetDbName = "educablog") {
   await ensureDatabaseExists(targetDbName);
 
   
-// 2) Lê e prepara o script
+
 const rawSql = fs.readFileSync(scriptPath, "utf8");
-
-// remove BOM do início (caractere invisível \uFEFF)
 const noBOM = rawSql.replace(/^\uFEFF/, "");
-
-// remove linhas do psql (\gexec, \connect) e bloco condicional de CREATE DATABASE
 const cleaned = stripPsqlMetaCommands(noBOM);
-
 const statements = splitSqlStatements(cleaned);
 
 
@@ -189,7 +182,7 @@ const statements = splitSqlStatements(cleaned);
   }
 }
 
-// Controller HTTP
+
 exports.setupDatabase = async (req, res) => {
   try {
     const scriptPath = path.join(__dirname, "educablog.sql");
