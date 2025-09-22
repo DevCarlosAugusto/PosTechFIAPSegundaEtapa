@@ -23,14 +23,14 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // Wanderson - Início 
-const databaseController = require('./database/database.controller');
-const PORT = process.env.PORT || 3000;
+const { setupDatabase } = require("./database/database.controller");
+const PORT = process.env.APP_PORT || 3000;
 
-// Configuração do Express - Wanderson 
-app.get('/setup-db', databaseController.setupDatabase);
+// Rota para configurar banco
+app.get("/setup-db", setupDatabase);
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
 
 // catch 404 and forward to error handler

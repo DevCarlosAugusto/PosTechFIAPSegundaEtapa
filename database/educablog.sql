@@ -1,20 +1,18 @@
-CREATE DATABASE educablog;
+SELECT 'CREATE DATABASE educablog'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'educablog') \gexec
 
--- Conectar ao banco
-\c educablog;
+\connect educablog;
 
--- Criar tabela de usuários (professores e alunos)
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    senha VARCHAR(200) NOT NULL, -- hash da senha
+    senha VARCHAR(200) NOT NULL, 
     perfil VARCHAR(20) NOT NULL CHECK (perfil IN ('professor','aluno')),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Criar tabela de posts
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     titulo VARCHAR(200) NOT NULL,
     conteudo TEXT NOT NULL,
@@ -23,7 +21,6 @@ CREATE TABLE posts (
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Criar função para atualizar campo atualizado_em automaticamente
 CREATE OR REPLACE FUNCTION atualizar_data_modificacao()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -32,7 +29,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Criar trigger para chamar a função antes de cada UPDATE
+DROP TRIGGER IF EXISTS trigger_atualizacao_post ON posts;
+
 CREATE TRIGGER trigger_atualizacao_post
 BEFORE UPDATE ON posts
 FOR EACH ROW
