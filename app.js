@@ -26,7 +26,6 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-});
 
 app.use((err, req, res) => {
 	// set locals, only providing error in development
