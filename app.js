@@ -1,4 +1,5 @@
-import createError from 'http-errors';
+// TODO: Criar Funções 'next' para utilizar o 'CreateError'
+// import createError from 'http-errors';
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -8,6 +9,7 @@ import { dirname } from 'path';
 
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
+import ErrorController from './src/controllers/ErrorController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-});
+app.use(ErrorController);
 
 app.use((err, req, res) => {
 	// set locals, only providing error in development
@@ -37,3 +39,5 @@ app.use((err, req, res) => {
 	res.status(err.status || 500);
 	res.render('error');
 });
+
+export default app;
