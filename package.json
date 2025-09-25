@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec 'npm run dev:watch'",
-    "dev:watch": "npm run lint && npm run test && node src/server.js",
+    "dev:watch": "npm run lint && node src/server.js",
     "jsdocs": "jsdoc /src -r",
     "lint": "eslint . --ext .js",
     "test": "vitest",
