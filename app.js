@@ -26,8 +26,6 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-app.use((req, res, next)=> {
-	next(createError(404));
 });
 
 app.use((err, req, res) => {
@@ -39,5 +37,3 @@ app.use((err, req, res) => {
 	res.status(err.status || 500);
 	res.render('error');
 });
-
-export default app;
