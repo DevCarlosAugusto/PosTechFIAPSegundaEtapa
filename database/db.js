@@ -1,5 +1,7 @@
-require("dotenv").config();
-const { Pool } = require("pg");
+import { Pool } from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 function getPgConfig() {
   if (process.env.DATABASE_URL) {
@@ -43,7 +45,5 @@ pool.on("error", (err) => {
   console.error("Erro inesperado no pool do Postgres:", err);
 });
 
-module.exports = {
-  pool,
-  query: (text, params) => pool.query(text, params),
-};
+export const query = (text, params) => pool.query(text, params);
+export default pool;
