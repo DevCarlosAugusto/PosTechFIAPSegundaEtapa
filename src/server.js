@@ -2,14 +2,18 @@ import app from '../app.js';
 import debug from 'debug';
 import http from 'http';
 
-let port = normalizePort(process.env.PORT || '3000');
+let port = normalizePort(process.env.PORT || process.env.APP_PORT || '3000');
 app.set('port', port);
 
 let server = http.createServer(app);
 
-server.listen(port);
+
 server.on('error', onError);
 server.on('listening', onListening);
+
+
+// escute em 0.0.0.0 para expor no host
+server.listen(port, '0.0.0.0');
 
 function normalizePort(val) {
 	let port = parseInt(val, 10);
