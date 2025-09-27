@@ -38,7 +38,7 @@ app.get('/setup-db', setupDatabase);
 app.use(ErrorController);
 
 // handler de erro final precisa do `next`
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   res.status(err.status || 500);
@@ -46,5 +46,3 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
-
- 
