@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import setupSwagger from './src/controllers/swagger.js';
 
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
@@ -15,6 +16,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 let app = express();
+
+setupSwagger(app);
 
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'jade');

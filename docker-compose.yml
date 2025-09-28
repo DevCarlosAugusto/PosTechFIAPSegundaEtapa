@@ -6,8 +6,8 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     depends_on:
       - postgres
-      - mongo
-      - mysql
+      # - mongo
+      # - mysql
     environment:
       # Variáveis de ambiente para conexão com os bancos de dados
       # Adapte os nomes, usuários, senhas e bancos de dados conforme necessário
@@ -34,35 +34,35 @@ services:
       - app-network
 
   # Serviço do MongoDB
-  mongo:
-    image: mongo:latest
-    container_name: volume-mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-    ports:
-      - "${MONGO_PORT}:27017"
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - app-network
+  # mongo:
+  #   image: mongo:latest
+  #   container_name: volume-mongodb
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  #     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+  #   ports:
+  #     - "${MONGO_PORT}:27017"
+  #   volumes:
+  #     - mongo_data:/data/db
+  #   networks:
+  #     - app-network
 
   # Serviço do MySQL
-  mysql:
-    image: mysql:latest
-    container_name: volume-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "${MYSQL_PORT}:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - app-network
+  # mysql:
+  #   image: mysql:latest
+  #   container_name: volume-mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #   ports:
+  #     - "${MYSQL_PORT}:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   networks:
+  #     - app-network
 
 # Definição das redes e volumes
 networks:
@@ -71,5 +71,5 @@ networks:
 
 volumes:
   postgres_data:
-  mongo_data:
-  mysql_data:
+  # mongo_data:
+  # mysql_data:
