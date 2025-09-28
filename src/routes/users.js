@@ -1,22 +1,13 @@
-// src/routes/users.js
-import express from 'express';
-import * as db from '../../database/db.js';
+import UsersController from '../controllers/UsersControllers.js';
 import { withDbInit } from '../middleware/withDbInit.js';
+import { Router } from 'express';
 
-const router = express.Router();
+const router = Router();
 
-// lista usuários
-router.get('/', withDbInit(async (req, res) => {
-  const { rows } = await db.query(
-    'SELECT id, nome, email, perfil FROM usuarios ORDER BY id'
-  );
-  res.json(rows);
-}));
-
-// teste simples do DB
-router.get('/dbtest', withDbInit(async (req, res) => {
-  const { rows } = await db.query('SELECT 1 AS ok');
-  res.json(rows[0]);
-}));
+router.get("/", withDbInit(UsersController.getAllUsers));
+router.get("/:id", withDbInit(UsersController.getUserById));
+router.post("/", withDbInit(UsersController.createUser));
+router.put("/:id", withDbInit(UsersController.updateUser)); 
+router.delete("/:id", withDbInit(UsersController.deleteUser)); 
 
 export default router;
