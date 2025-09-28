@@ -10,12 +10,16 @@ import setupSwagger from './src/controllers/swagger.js';
 
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
+import postsRouter from './src/routes/posts.js';
 import ErrorController from './src/controllers/ErrorController.js';
+
+// importe o setup do DB
+import { setupDatabase } from './database/database.controller.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-let app = express();
+const app = express();
 
 setupSwagger(app);
 
@@ -30,17 +34,20 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/posts', postsRouter);
 
+// rota para preparar o banco (idempotente)
+app.get('/setup-db', setupDatabase);
+
+// Middlewares / controllers de erro específicos
 app.use(ErrorController);
 
-app.use((err, req, res) => {
-	// set locals, only providing error in development
-	res.locals.message = err.message;
-	res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-	// render the error page
-	res.status(err.status || 500);
-	res.render('error');
+// handler de erro final precisa do `next`
+app.use((err, req, res, _next) => {
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 export default app;
