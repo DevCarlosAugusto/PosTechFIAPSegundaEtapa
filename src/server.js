@@ -19,12 +19,12 @@ function normalizePort(val) {
 	let port = parseInt(val, 10);
 
 	if (isNaN(port)) {
-		// named pipe
+		
 		return val;
 	}
 
 	if (port >= 0) {
-		// port number
+		
 		return port;
 	}
 
@@ -40,7 +40,6 @@ function onError(error) {
 		? 'Pipe ' + port
 		: 'Port ' + port;
 
-	// handle specific listen errors with friendly messages
 	switch (error.code) {
 		case 'EACCES':
 			console.error(bind + ' requires elevated privileges');

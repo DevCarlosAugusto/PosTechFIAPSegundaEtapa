@@ -5,7 +5,7 @@ import { withDbInit } from '../middleware/withDbInit.js';
 
 const router = express.Router();
 
-// lista usuários (auto-init do DB se faltar schema)
+// lista usuários
 router.get('/', withDbInit(async (req, res) => {
   const { rows } = await db.query(
     'SELECT id, nome, email, perfil FROM usuarios ORDER BY id'

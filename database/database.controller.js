@@ -43,7 +43,7 @@ async function ensureDatabaseExists(dbName) {
   const baseCfg = getPgConfig();
 
   const adminCfg = {
-    ...baseCfg,                // <- garante que é spread
+    ...baseCfg,            
     database: 'postgres',
   };
   const adminPool = new Pool(adminCfg);
@@ -166,9 +166,6 @@ async function runSqlFileIdempotent(scriptPath, targetDbName = 'educablog') {
   }
 }
 
-
-// ---- Inicialização programática (para o wrapper por rota) ----
-
 // Códigos/classificações de erro do Postgres que indicam ausência de DB/tabela/esquema
 export const DB_ERROR_CODES_INIT = new Set([
   '3D000', // invalid_catalog_name (DB não existe)
@@ -176,23 +173,22 @@ export const DB_ERROR_CODES_INIT = new Set([
   '3F000', // invalid_schema_name
   '08001', // sqlclient_unable_to_establish_sqlconnection
   '08006', // connection_failure
-  '28P01', // invalid_password (também pode aparecer antes do schema existir)
+  '28P01', // invalid_password 
 ]);
 
-// Heurística simples para detectar erros que pedem init (cobre mensagens sem code)
 export function isInitError(err) {
   if (!err) return false;
   if (err.code && DB_ERROR_CODES_INIT.has(err.code)) return true;
   const msg = String(err.message || '').toLowerCase();
   return (
-    msg.includes('does not exist') ||      // "relation ... does not exist", "database does not exist"
+    msg.includes('does not exist') ||      
     msg.includes('undefined table') ||
     msg.includes('invalid catalog name') ||
     msg.includes('invalid schema name')
   );
 }
 
-// Função programática que roda o SQL idempotente (chamada pelo wrapper)
+
 export async function ensureSchema(targetDbName = process.env.PGDATABASE || 'educablog') {
   const scriptPath = path.join(__dirname, 'educablog.sql');
   await runSqlFileIdempotent(scriptPath, targetDbName);
@@ -201,7 +197,6 @@ export async function ensureSchema(targetDbName = process.env.PGDATABASE || 'edu
 
 
 
-// export nomeado em ESM
 export async function setupDatabase(req, res) {
   try {
     const scriptPath = path.join(__dirname, 'educablog.sql');

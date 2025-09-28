@@ -39,5 +39,4 @@ pool.on('error', (err) => console.error('Erro inesperado no pool do Postgres:', 
 
 export const query = (text, params) => pool.query(text, params);
 
-// opcional, mas útil se alguém importar como default
 export default { pool, query };
