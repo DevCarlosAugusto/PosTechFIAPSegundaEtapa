@@ -9,6 +9,7 @@ import { dirname } from 'path';
 
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
+import postsRouter from './src/routes/posts.js';
 import ErrorController from './src/controllers/ErrorController.js';
 
 // importe o setup do DB
@@ -30,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/posts', postsRouter);
 
 // rota para preparar o banco (idempotente)
 app.get('/setup-db', setupDatabase);
