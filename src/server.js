@@ -1,13 +1,20 @@
 import app from '../app.js';
 import debug from 'debug';
 import http from 'http';
+import dotenv from 'dotenv';
+
+
+dotenv.config();
 
 let port = normalizePort(process.env.PORT || process.env.APP_PORT || '3000');
+
 app.set('port', port);
 
 let server = http.createServer(app);
 
 
+
+server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
