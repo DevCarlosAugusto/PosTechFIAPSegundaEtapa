@@ -35,7 +35,7 @@ import Post from '../models/Post.js';
 
 /**
  * @openapi
- * /api/posts:
+ * /posts:
  *   get:
  *     summary: Lista todos os posts
  *     tags: [Posts]
@@ -66,7 +66,7 @@ const PostsController = {
 
   /**
    * @openapi
-   * /api/posts/{id}:
+   * /posts/{id}:
    *   get:
    *     summary: Busca um post por ID
    *     tags: [Posts]
@@ -105,6 +105,48 @@ const PostsController = {
     }
   },
 
+  /**
+   * @openapi
+   * /posts:
+   *   post:
+   *     summary: Cria um novo post
+   *     tags: [Posts]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               titulo:
+   *                 type: string
+   *                 description: Título do post
+   *                 example: Meu novo post
+   *               conteudo:
+   *                 type: string
+   *                 description: Conteúdo do post
+   *                 example: Este é o conteúdo do post
+   *               autor_id:
+   *                 type: integer
+   *                 description: ID do autor do post
+   *                 example: 1
+   *     responses:
+   *       201:
+   *         description: Post criado com sucesso
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Post' }
+   *       400:
+   *         description: Campos obrigatórios ausentes
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   *       500:
+   *         description: Erro ao criar post
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   */
   async createPost(req, res) {
     const { titulo, conteudo, autor_id } = req.body;
 
@@ -121,6 +163,56 @@ const PostsController = {
     }
   },
 
+  /**
+   * @openapi
+   * /posts/{id}:
+   *   put:
+   *     summary: Atualiza um post existente
+   *     tags: [Posts]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *         description: ID do post a ser atualizado
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               titulo:
+   *                 type: string
+   *                 description: Novo título do post
+   *                 example: Título atualizado
+   *               conteudo:
+   *                 type: string
+   *                 description: Novo conteúdo do post
+   *                 example: Conteúdo atualizado
+   *     responses:
+   *       200:
+   *         description: Post atualizado com sucesso
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Post' }
+   *       400:
+   *         description: Campos obrigatórios ausentes
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   *       404:
+   *         description: Post não encontrado
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   *       500:
+   *         description: Erro ao atualizar post
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   */
   async updatePost(req, res) {
     const id = parseInt(req.params.id, 10);
     const { titulo, conteudo } = req.body;
@@ -139,6 +231,41 @@ const PostsController = {
     }
   },
 
+  /**
+   * @openapi
+   * /posts/{id}:
+   *   delete:
+   *     summary: Exclui um post por ID
+   *     tags: [Posts]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
+   *         description: ID do post a ser excluído
+   *     responses:
+   *       200:
+   *         description: Post excluído com sucesso
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: Post com ID 1 foi excluído com sucesso.
+   *       404:
+   *         description: Post não encontrado
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   *       500:
+   *         description: Erro ao excluir post
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   */
   async deletePost(req, res) {
     const id = parseInt(req.params.id, 10);
 
@@ -152,6 +279,38 @@ const PostsController = {
     }
   },
 
+  /**
+   * @openapi
+   * /posts/search:
+   *   get:
+   *     summary: Busca posts por palavra-chave
+   *     tags: [Posts]
+   *     parameters:
+   *       - in: query
+   *         name: palavraChave
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Palavra-chave para busca
+   *     responses:
+   *       200:
+   *         description: Resultados da busca
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items: { $ref: '#/components/schemas/Post' }
+   *       400:
+   *         description: Parâmetro de busca ausente
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   *       500:
+   *         description: Erro ao buscar posts
+   *         content:
+   *           application/json:
+   *             schema: { $ref: '#/components/schemas/Error' }
+   */
   async searchPosts(req, res) {
     const termo = req.query.palavraChave;
 

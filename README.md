@@ -61,3 +61,7 @@ Caso queira parar todos os serviços docker, execute o comando abaixo:
   docker compose down
 ```
 
+Documentação
+swagger http://localhost:3000/api-docs/
+
+json http://localhost:3000//swagger.json/

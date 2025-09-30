@@ -6,9 +6,9 @@ function setupSwagger(app) {
     definition: {
       openapi: '3.0.3',
       info: {
-        title: 'API - PosTechFIAPSegundaEtapa',
+        title: 'Swagger EducaBlog',
         version: '1.0.0',
-        description: 'Documentação gerada com swagger-jsdoc + swagger-ui-express',
+        description: '<a>http://localhost:3000/swagger.json/</a>',
       },
       servers: [
         { url: 'http://localhost:3000', description: 'Local' }
