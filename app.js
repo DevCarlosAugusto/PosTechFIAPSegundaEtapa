@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import setupSwagger from './src/controllers/swagger.js';
+import setupSwagger from './src/swagger.js';
 
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
