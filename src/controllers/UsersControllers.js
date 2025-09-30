@@ -1,7 +1,62 @@
 import User from '../models/User.js';
 import bcrypt from 'bcrypt';
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 1
+ *         nome:
+ *           type: string
+ *           example: "João Silva"
+ *         email:
+ *           type: string
+ *           example: "joao.silva@email.com"
+ *         senha:
+ *           type: string
+ *           example: "hashed_password"
+ *         perfil:
+ *           type: string
+ *           example: "admin"
+ *     Error:
+ *       type: object
+ *       properties:
+ *         error:
+ *           type: string
+ *           example: "Mensagem de erro"
+ */
+
+
+
+
+
+
 const UsersController = {
+  /**
+ * @openapi
+ * /users:
+ *   get:
+ *     summary: Lista todos os usuários
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Lista de usuários
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { $ref: '#/components/schemas/User' }
+ *       500:
+ *         description: Erro ao buscar usuários
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ */
     async getAllUsers(req, res) {
         try {
             const users = await User.findAll();
@@ -11,6 +66,36 @@ const UsersController = {
             res.status(500).json({ error: `Erro ao buscar users ${error.message}` });
         }
     },
+/**
+ * @openapi
+ * /users/{id}:
+ *   get:
+ *     summary: Busca um usuário por ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do usuário
+ *     responses:
+ *       200:
+ *         description: Usuário encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/User' }
+ *       404:
+ *         description: Usuário não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       500:
+ *         description: Erro ao buscar usuário
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ */
 
     async getUserById(req, res) {
         try {
@@ -23,6 +108,53 @@ const UsersController = {
             res.status(500).json({ error: 'Erro ao buscar user' });
         }
     },
+
+/**
+ * @openapi
+ * /users:
+ *   post:
+ *     summary: Cria um novo usuário
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 description: Nome do usuário
+ *                 example: João Silva
+ *               email:
+ *                 type: string
+ *                 description: Email do usuário
+ *                 example: joao.silva@email.com
+ *               senha:
+ *                 type: string
+ *                 description: Senha do usuário
+ *                 example: senha123
+ *               perfil:
+ *                 type: string
+ *                 description: Perfil do usuário
+ *                 example: admin
+ *     responses:
+ *       201:
+ *         description: Usuário criado com sucesso
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/User' }
+ *       400:
+ *         description: Campos obrigatórios ausentes
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       500:
+ *         description: Erro ao criar usuário
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ */
 
     async createUser(req, res) {
         const { nome, email, senha, perfil } = req.body;
@@ -41,6 +173,60 @@ const UsersController = {
             res.status(500).json({ error: 'Erro ao criar user' });
         }
     },
+/**
+ * @openapi
+ * /users/{id}:
+ *   put:
+ *     summary: Atualiza um usuário existente
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do usuário a ser atualizado
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 description: Nome do usuário
+ *                 example: João Silva
+ *               email:
+ *                 type: string
+ *                 description: Email do usuário
+ *                 example: joao.silva@email.com
+ *               perfil:
+ *                 type: string
+ *                 description: Perfil do usuário
+ *                 example: admin
+ *     responses:
+ *       200:
+ *         description: Usuário atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/User' }
+ *       400:
+ *         description: Campos obrigatórios ausentes
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       404:
+ *         description: Usuário não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       500:
+ *         description: Erro ao atualizar usuário
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ */
 
   async updateUser(req, res) {
     const id = parseInt(req.params.id, 10);
@@ -59,6 +245,41 @@ const UsersController = {
       res.status(500).json({ error: 'Erro ao atualizar user.' });
     }
   },
+/**
+ * @openapi
+ * /users/{id}:
+ *   delete:
+ *     summary: Exclui um usuário por ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do usuário a ser excluído
+ *     responses:
+ *       200:
+ *         description: Usuário excluído com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Usuário com ID 1 foi excluído com sucesso.
+ *       404:
+ *         description: Usuário não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       500:
+ *         description: Erro ao excluir usuário
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ */
 
   async deleteUser(req, res) {
     const id = parseInt(req.params.id, 10);
