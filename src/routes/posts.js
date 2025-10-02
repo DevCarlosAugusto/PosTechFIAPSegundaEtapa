@@ -1,14 +1,15 @@
 import PostsController from '../controllers/PostsController.js';
 import { withDbInit } from '../middleware/withDbInit.js';
 import { Router } from 'express';
+import { autenticar } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get("/", withDbInit(PostsController.getAllPosts));
-router.get("/search", withDbInit(PostsController.searchPosts)); 
-router.get("/:id", withDbInit(PostsController.getPostById));
-router.post("/", withDbInit(PostsController.createPost));
-router.put("/:id", withDbInit(PostsController.updatePost)); 
-router.delete("/:id", withDbInit(PostsController.deletePost)); 
+router.get("/", autenticar, withDbInit(PostsController.getAllPosts));
+router.get("/search", autenticar, withDbInit(PostsController.searchPosts)); 
+router.get("/:id", autenticar, withDbInit(PostsController.getPostById));
+router.post("/", autenticar, withDbInit(PostsController.createPost));
+router.put("/:id", autenticar, withDbInit(PostsController.updatePost)); 
+router.delete("/:id", autenticar, withDbInit(PostsController.deletePost)); 
 
 export default router;

@@ -56,8 +56,16 @@ import Post from '../models/Post.js';
 const PostsController = {
   async getAllPosts(req, res) {
     try {
-      const posts = await Post.findAll();
-      res.json(posts);
+      // TO DO:
+      // Adicionar retorno personalizado para perfil de professor e perfil de aluno 
+      if (req.user.perfil === 'professor') {
+        const posts = await Post.findAll();
+        res.json(posts);
+      } else {
+        const posts = await Post.findAll();
+        res.json(posts);
+      }
+      
     } catch (error) {
       console.error('Erro ao buscar posts:', error);
       res.status(500).json({ error: `Erro ao buscar posts ${error.message}` });
@@ -101,7 +109,7 @@ const PostsController = {
       res.json(post);
     } catch (error) {
       console.error('Erro ao buscar post:', error);
-      res.status(500).json({ error: 'Erro ao buscar post' });
+      res.status(500).json({ error: `Erro ao buscar post ${error.message}` });
     }
   },
 
@@ -159,7 +167,10 @@ const PostsController = {
       res.status(201).json(novoPost);
     } catch (error) {
       console.error('Erro ao criar post:', error);
-      res.status(500).json({ error: 'Erro ao criar post' });
+      if (error.code === '23503' && error.constraint === 'posts_autor_id_fkey') {
+        return res.status(400).json({ error: 'O autor informado não existe. Verifique o campo autor_id.' });
+      }
+      res.status(500).json({ error: `Erro ao criar post: ${error.message}` });
     }
   },
 
@@ -221,13 +232,22 @@ const PostsController = {
       return res.status(400).json({ error: 'Campos obrigatórios: titulo, conteudo.' });
     }
 
+    if (req.user.perfil === 'aluno') {
+      if (req.user.id != id) {
+        return res.status(401).json({ error: 'Sem permissão para alteração do post.' });
+      }
+    }
+
     try {
       const postAtualizado = await Post.update(id, { titulo, conteudo });
       if (!postAtualizado) return res.status(404).json({ error: 'Post não encontrado.' });
       res.json(postAtualizado);
     } catch (error) {
       console.error('Erro ao atualizar post:', error);
-      res.status(500).json({ error: 'Erro ao atualizar post.' });
+      if (error.code === '23503' && error.constraint === 'posts_autor_id_fkey') {
+        return res.status(400).json({ error: 'O autor informado não existe. Verifique o campo autor_id.' });
+      }
+      res.status(500).json({ error: `Erro ao atualizar post: ${error.message}` });
     }
   },
 
@@ -275,7 +295,7 @@ const PostsController = {
       res.status(200).json({ message: `Post com ID ${id} foi excluído com sucesso.` });
     } catch (error) {
       console.error('Erro ao excluir post:', error);
-      res.status(500).json({ error: 'Erro ao excluir post.' });
+      res.status(500).json({ error: `Erro ao excluir post: ${error.message}` });
     }
   },
 
@@ -323,7 +343,7 @@ const PostsController = {
       res.json(resultados);
     } catch (error) {
       console.error('Erro ao buscar posts:', error);
-      res.status(500).json({ error: 'Erro ao buscar posts.' });
+      res.status(500).json({ error: `Erro ao buscar posts: ${error.message}` });
     }
   }
 };

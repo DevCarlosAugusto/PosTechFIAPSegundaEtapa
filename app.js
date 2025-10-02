@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import setupSwagger from './src/swagger.js';
 
+import authRouter from './src/routes/auth.js';
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
 import postsRouter from './src/routes/posts.js';
@@ -33,6 +34,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'src/public')));
 
 app.use('/', indexRouter);
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 

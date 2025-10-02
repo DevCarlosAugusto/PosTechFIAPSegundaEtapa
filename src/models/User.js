@@ -24,6 +24,18 @@ const User = {
         return result.rows[0];
     },
 
+    async findByEmail(email) {
+        const result = await query(`
+            SELECT 
+                * 
+            FROM 
+                usuarios 
+            WHERE 
+                email = $1
+        `, [email]);
+        return result.rows[0];
+    },
+
     async create({ nome, email, senha, perfil }) {
         const result = await query(`
             INSERT INTO usuarios (nome, email, senha, perfil) 
