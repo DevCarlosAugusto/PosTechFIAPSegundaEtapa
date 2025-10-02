@@ -105,7 +105,7 @@ const UsersController = {
             res.json(user);
         } catch (error) {
             console.error('Erro ao buscar user:', error);
-            res.status(500).json({ error: 'Erro ao buscar user' });
+            res.status(500).json({ error: `Erro ao buscar user: ${error.message}` });
         }
     },
 
@@ -170,7 +170,10 @@ const UsersController = {
             res.status(201).json(novoUser);
         } catch (error) {
             console.error('Erro ao criar user:', error);
-            res.status(500).json({ error: 'Erro ao criar user' });
+            if (error.code === '23505' && error.constraint === 'usuarios_email_key') {
+              return res.status(409).json({ error: 'Este e-mail já está cadastrado.' });
+            }
+            res.status(500).json({ error: `Erro ao criar user: ${error.message}` });
         }
     },
 /**
@@ -236,13 +239,24 @@ const UsersController = {
       return res.status(400).json({ error: 'Campos obrigatórios: nome, email, perfil.' });
     }
 
+    if (req.user.perfil === 'aluno') {
+      if (req.user.id != id) {
+        return res.status(401).json({ error: 'Sem permissão para alteração do usuário.' });
+      }
+    }
+
     try {
       const userAtualizado = await User.update(id, { nome, email, perfil });
       if (!userAtualizado) return res.status(404).json({ error: 'User não encontrado.' });
       res.json(userAtualizado);
     } catch (error) {
       console.error('Erro ao atualizar user:', error);
-      res.status(500).json({ error: 'Erro ao atualizar user.' });
+
+      if (error.code === '23505' && error.constraint === 'usuarios_email_key') {
+        return res.status(409).json({ error: 'Este e-mail já está cadastrado.' });
+      }
+      
+      res.status(500).json({ error: `Erro ao atualizar user: ${error.message}` });
     }
   },
 /**
@@ -290,7 +304,7 @@ const UsersController = {
       res.status(200).json({ message: `User com ID ${id} foi excluído com sucesso.` });
     } catch (error) {
       console.error('Erro ao excluir user:', error);
-      res.status(500).json({ error: 'Erro ao excluir user.' });
+      res.status(500).json({ error: `Erro ao excluir user: ${error.message}` });
     }
   },
 
