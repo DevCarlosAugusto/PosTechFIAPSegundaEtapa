@@ -8,14 +8,11 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import setupSwagger from './src/swagger.js';
 
-import authRouter from './src/routes/auth.js';
-import indexRouter from './src/routes/home.js';
-import usersRouter from './src/routes/users.js';
-import postsRouter from './src/routes/posts.js';
+import AuthRouter from './src/routes/auth.js';
+import HomeRouter from './src/routes/home.js';
+import UsersRouter from './src/routes/users.js';
+import PostsRouter from './src/routes/posts.js';
 import ErrorController from './src/controllers/error.controller.js';
-
-// importe o setup do DB
-import { setupDatabase } from './src/controllers/database.controller.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -33,13 +30,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'src/public')));
 
-app.use('/', indexRouter);
-app.use('/auth', authRouter);
-app.use('/users', usersRouter);
-app.use('/posts', postsRouter);
-
-// rota para preparar o banco (idempotente)
-app.get('/setup-db', setupDatabase);
+app.use('/', HomeRouter);
+app.use('/auth', AuthRouter);
+app.use('/users', UsersRouter);
+app.use('/posts', PostsRouter);
 
 // Middlewares / controllers de erro específicos
 app.use(ErrorController);

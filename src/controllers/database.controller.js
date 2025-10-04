@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { Pool } from 'pg';
-import * as db from '../../database/db.js';
+import * as db from '../database/db.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
