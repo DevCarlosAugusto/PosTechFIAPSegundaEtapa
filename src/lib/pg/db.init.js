@@ -31,7 +31,7 @@ const dataSourceOptions = {
 
 export async function initializeDatabase() {
     if (!DATABASE_NAME) {
-        console.error("[DB INIT] ERRO: A variável de ambiente PG_DB_NAME não está definida.");
+        console.error("[DB INIT] ERRO: A variável de ambiente POSTGRES_DB não está definida.");
         throw new Error("DATABASE_NAME não configurado. Verifique seus arquivos .env.");
     }
 

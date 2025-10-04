@@ -1,14 +1,23 @@
 import { EntitySchema } from 'typeorm';
 
-// Definindo o ENUM separadamente para clareza
-const UserType = {
-    PROFESSOR: 'PROFESSOR',
-    ALUNO: 'ALUNO',
-};
+export class UserEntity {
+    id;
+    nome;
+    email;
+    password_hash;
+    user_type;
+    serie;
+    subject;
+    created_at;
+    updated_at;
+    posts;
+    edited_posts;
+}
 
-export const UserEntity = new EntitySchema({
-    name: 'User',
+export const UserSchema = new EntitySchema({
+    name: 'UserEntity',
     tableName: 'users',
+    target: UserEntity, // Vincula o esquema à classe UserEntity
     columns: {
         id: {
             type: Number,
@@ -20,12 +29,6 @@ export const UserEntity = new EntitySchema({
             length: 30,
             nullable: false,
         },
-        user_type: {
-            // No PostgreSQL, você define o tipo ENUM como 'enum' e especifica os valores.
-            type: 'enum',
-            enum: Object.values(UserType),
-            nullable: false,
-        },
         email: {
             type: String,
             length: 100,
@@ -33,7 +36,14 @@ export const UserEntity = new EntitySchema({
             nullable: false,
         },
         password_hash: {
-            type: String, // Adicionado para autenticação, não foi especificado, mas é padrão
+            type: 'varchar',
+            length: 100,
+            nullable: false,
+        },
+        user_type: {
+            type: 'enum',
+            enum: ['PROFESSOR', 'ALUNO'],
+            default: 'ALUNO',
             nullable: false,
         },
         serie: {
@@ -47,17 +57,26 @@ export const UserEntity = new EntitySchema({
             nullable: true,
         },
         created_at: {
-            type: Date,
-            createDate: true, // TypeORM lida com o DEFAULT CURRENT_TIMESTAMP
+            type: 'timestamp',
+            createDate: true,
+            nullable: false,
+        },
+        updated_at: {
+            type: 'timestamp',
+            updateDate: true,
             nullable: false,
         },
     },
-    // Relações (necessário para a Entity Post)
     relations: {
         posts: {
             type: 'one-to-many',
-            target: 'Post', // Nome da outra Entity
-            inverseSide: 'createdBy',
+            target: 'PostEntity',
+            inverseSide: 'created_by',
+        },
+        edited_posts: {
+            type: 'one-to-many',
+            target: 'PostEntity',
+            inverseSide: 'edited_by',
         },
     },
 });

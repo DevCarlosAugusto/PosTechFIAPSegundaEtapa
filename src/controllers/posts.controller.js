@@ -1,11 +1,11 @@
 // PostsControllers.js
-import Post from '../models/post.js';
+import PostModel from '../models/post.model.js';
 
 /**
  * @openapi
  * components:
  *   schemas:
- *     Post:
+ *     PostModel:
  *       type: object
  *       properties:
  *         id:
@@ -46,7 +46,7 @@ import Post from '../models/post.js';
  *           application/json:
  *             schema:
  *               type: array
- *               items: { $ref: '#/components/schemas/Post' }
+ *               items: { $ref: '#/components/schemas/PostModel' }
  *       500:
  *         description: Erro ao buscar posts
  *         content:
@@ -59,10 +59,10 @@ const PostsController = {
       // TO DO:
       // Adicionar retorno personalizado para perfil de professor e perfil de aluno 
       if (req.user.perfil === 'professor') {
-        const posts = await Post.findAll();
+        const posts = await PostModel.findAll();
         res.json(posts);
       } else {
-        const posts = await Post.findAll();
+        const posts = await PostModel.findAll();
         res.json(posts);
       }
       
@@ -86,12 +86,12 @@ const PostsController = {
    *         description: ID do post
    *     responses:
    *       200:
-   *         description: Post encontrado
+   *         description: PostModel encontrado
    *         content:
    *           application/json:
-   *             schema: { $ref: '#/components/schemas/Post' }
+   *             schema: { $ref: '#/components/schemas/PostModel' }
    *       404:
-   *         description: Post não encontrado
+   *         description: PostModel não encontrado
    *         content:
    *           application/json:
    *             schema: { $ref: '#/components/schemas/Error' }
@@ -104,8 +104,8 @@ const PostsController = {
   async getPostById(req, res) {
     try {
       const id = parseInt(req.params.id, 10);
-      const post = await Post.findById(id);
-      if (!post) return res.status(404).json({ error: 'Post não encontrado' });
+      const post = await PostModel.findById(id);
+      if (!post) return res.status(404).json({ error: 'PostModel não encontrado' });
       res.json(post);
     } catch (error) {
       console.error('Erro ao buscar post:', error);
@@ -140,10 +140,10 @@ const PostsController = {
    *                 example: 1
    *     responses:
    *       201:
-   *         description: Post criado com sucesso
+   *         description: PostModel criado com sucesso
    *         content:
    *           application/json:
-   *             schema: { $ref: '#/components/schemas/Post' }
+   *             schema: { $ref: '#/components/schemas/PostModel' }
    *       400:
    *         description: Campos obrigatórios ausentes
    *         content:
@@ -163,7 +163,7 @@ const PostsController = {
     }
 
     try {
-      const novoPost = await Post.create({ titulo, conteudo, autor_id });
+      const novoPost = await PostModel.create({ titulo, conteudo, autor_id });
       res.status(201).json(novoPost);
     } catch (error) {
       console.error('Erro ao criar post:', error);
@@ -204,17 +204,17 @@ const PostsController = {
    *                 example: Conteúdo atualizado
    *     responses:
    *       200:
-   *         description: Post atualizado com sucesso
+   *         description: PostModel atualizado com sucesso
    *         content:
    *           application/json:
-   *             schema: { $ref: '#/components/schemas/Post' }
+   *             schema: { $ref: '#/components/schemas/PostModel' }
    *       400:
    *         description: Campos obrigatórios ausentes
    *         content:
    *           application/json:
    *             schema: { $ref: '#/components/schemas/Error' }
    *       404:
-   *         description: Post não encontrado
+   *         description: PostModel não encontrado
    *         content:
    *           application/json:
    *             schema: { $ref: '#/components/schemas/Error' }
@@ -239,8 +239,8 @@ const PostsController = {
     }
 
     try {
-      const postAtualizado = await Post.update(id, { titulo, conteudo });
-      if (!postAtualizado) return res.status(404).json({ error: 'Post não encontrado.' });
+      const postAtualizado = await PostModel.update(id, { titulo, conteudo });
+      if (!postAtualizado) return res.status(404).json({ error: 'PostModel não encontrado.' });
       res.json(postAtualizado);
     } catch (error) {
       console.error('Erro ao atualizar post:', error);
@@ -266,7 +266,7 @@ const PostsController = {
    *         description: ID do post a ser excluído
    *     responses:
    *       200:
-   *         description: Post excluído com sucesso
+   *         description: PostModel excluído com sucesso
    *         content:
    *           application/json:
    *             schema:
@@ -274,9 +274,9 @@ const PostsController = {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: Post com ID 1 foi excluído com sucesso.
+   *                   example: PostModel com ID 1 foi excluído com sucesso.
    *       404:
-   *         description: Post não encontrado
+   *         description: PostModel não encontrado
    *         content:
    *           application/json:
    *             schema: { $ref: '#/components/schemas/Error' }
@@ -290,8 +290,8 @@ const PostsController = {
     const id = parseInt(req.params.id, 10);
 
     try {
-      const sucesso = await Post.remove(id);
-      if (!sucesso) return res.status(404).json({ error: 'Post não encontrado.' });
+      const sucesso = await PostModel.remove(id);
+      if (!sucesso) return res.status(404).json({ error: 'PostModel não encontrado.' });
       res.status(200).json({ message: `Post com ID ${id} foi excluído com sucesso.` });
     } catch (error) {
       console.error('Erro ao excluir post:', error);
@@ -319,7 +319,7 @@ const PostsController = {
    *           application/json:
    *             schema:
    *               type: array
-   *               items: { $ref: '#/components/schemas/Post' }
+   *               items: { $ref: '#/components/schemas/PostModel' }
    *       400:
    *         description: Parâmetro de busca ausente
    *         content:
@@ -339,7 +339,7 @@ const PostsController = {
     }
 
     try {
-      const resultados = await Post.search(termo);
+      const resultados = await PostModel.search(termo);
       res.json(resultados);
     } catch (error) {
       console.error('Erro ao buscar posts:', error);

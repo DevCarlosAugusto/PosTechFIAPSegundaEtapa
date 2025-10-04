@@ -1,28 +1,53 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import User from '../models/user.js';
+import createError from 'http-errors';
+import UserRepository from '../models/user.model.js';
 
-const SECRET = process.env.JWT_SECRET || 'segredo-super-seguro';
+const SECRET = process.env.JWT_SECRET || 'segredo-super-secreto';
 
-export async function login(req, res) {
-  const { email, senha } = req.body;
+/**
+ * @typedef {import('express').RequestHandler} RequestHandler
+ */
 
-  try {
-    const user = await User.findByEmail(email);
-    if (!user) return res.status(401).json({ error: `Usuário não encontrado: ${email} ${user}` });
+/**
+ * Lida com a autenticação (Login) de um usuário.
+ * POST /auth/login
+ * @type {RequestHandler}
+ */
+export const login = async (req, res, next) => {
+    const { email, password } = req.body;
 
-    const senhaValida = await bcrypt.compare(senha, user.senha);
-    if (!senhaValida) return res.status(401).json({ error: 'Senha incorreta.' });
+    if (!email || !password) {
+        return next(createError(400, 'Email e senha são obrigatórios.'));
+    }
 
-    const token = jwt.sign(
-      { id: user.id, perfil: user.perfil },
-      SECRET,
-      { expiresIn: '2h' }
-    );
+    try {
+        const user = await UserRepository.findByEmail(email);
 
-    res.json({ token, 'perfil': user.perfil});
-  } catch (error) {
-    console.error('Erro no login:', error);
-    res.status(500).json({ error: 'Erro interno no login.' });
-  }
-}
+        if (!user) {
+            return next(createError(401, 'Credenciais inválidas.'));
+        }
+
+        const isPasswordValid = await UserRepository.comparePassword(password, user.password_hash);
+
+        if (!isPasswordValid) {
+            return next(createError(401, 'Credenciais inválidas.'));
+        }
+
+        const token = jwt.sign(
+            { id: user.id, user_type: user.user_type, email: user.email }, // Usando user_type
+            SECRET,
+            { expiresIn: '2h' }
+        );
+
+        res.json({
+            token,
+            user_type: user.user_type,
+            id: user.id,
+            nome: user.nome
+        });
+
+    } catch (error) {
+        console.error('Erro no login do usuário:', error.message);
+        next(createError(500, 'Falha interna ao realizar o login.'));
+    }
+};

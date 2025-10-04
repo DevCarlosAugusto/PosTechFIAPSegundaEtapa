@@ -1,6 +1,6 @@
 import { query } from '../database/db.js';
 
-const Post = {
+const PostModel = {
   async findAll() {
     console.log('Método findAll foi chamado'); 
     const result = await query(`
@@ -77,4 +77,4 @@ const Post = {
   }
 };
 
-export default Post;
+export default PostModel;

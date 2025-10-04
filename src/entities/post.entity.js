@@ -1,8 +1,23 @@
 import { EntitySchema } from 'typeorm';
+// eslint-disable-next-line
+import { UserEntity } from './user.entity.js';
 
-export const PostEntity = new EntitySchema({
-    name: 'Post',
+export class PostEntity {
+    id;
+    title;
+    content;
+    created_by_id;
+    edited_by_id;
+    created_at;
+    edited_at;
+    created_by;
+    edited_by;
+}
+
+export const PostSchema = new EntitySchema({
+    name: 'PostEntity',
     tableName: 'posts',
+    target: PostEntity,
     columns: {
         id: {
             type: Number,
@@ -11,43 +26,52 @@ export const PostEntity = new EntitySchema({
         },
         title: {
             type: String,
-            length: 30,
+            length: 100,
             nullable: false,
         },
         content: {
-            type: 'text', // Tipo TEXT para muito conteúdo
+            type: 'text',
             nullable: false,
         },
+        created_by_id: {
+            type: Number,
+            nullable: false,
+        },
+        edited_by_id: {
+            type: Number,
+            nullable: true,
+        },
         created_at: {
-            type: Date,
+            type: 'timestamp',
             createDate: true,
             nullable: false,
         },
         edited_at: {
-            type: Date,
-            updateDate: true, // TypeORM lida com o update (opcional)
+            type: 'timestamp',
+            updateDate: true,
             nullable: true,
         },
     },
-    // Relações (Chaves Estrangeiras)
     relations: {
-        createdBy: {
+        created_by: {
             type: 'many-to-one',
-            target: 'User', // Nome da Entity referenciada
+            target: 'UserEntity',
             joinColumn: {
-                name: 'created_by', // Nome da coluna FK na tabela 'posts'
+                name: 'created_by_id',
             },
             nullable: false,
-            onDelete: 'CASCADE', // ON DELETE CASCADE
+            onDelete: 'CASCADE',
+            inverseSide: 'posts'
         },
-        editedBy: {
+        edited_by: {
             type: 'many-to-one',
-            target: 'User',
+            target: 'UserEntity',
             joinColumn: {
-                name: 'edited_by', // Nome da coluna FK na tabela 'posts'
+                name: 'edited_by_id',
             },
-            nullable: true, // A coluna 'edited_by' é opcional
-            onDelete: 'SET NULL', // ON DELETE SET NULL
+            nullable: true,
+            onDelete: 'SET NULL',
+            inverseSide: 'edited_posts'
         },
     },
 });

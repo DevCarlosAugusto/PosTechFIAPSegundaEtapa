@@ -14,7 +14,7 @@ import setupSwagger from './src/swagger.js';
 import AuthRouter from './src/routes/auth.js';
 import HomeRouter from './src/routes/home.js';
 import UsersRouter from './src/routes/users.js';
-import PostsRouter from './src/routes/posts.js';
+// import PostsRouter from './src/routes/posts.js';
 import ErrorController from './src/controllers/error.controller.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -48,7 +48,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 app.use('/', HomeRouter);
 app.use('/auth', AuthRouter);
 app.use('/users', UsersRouter);
-app.use('/posts', PostsRouter);
+// app.use('/posts', PostsRouter);
 
 app.use(ErrorController);
 
