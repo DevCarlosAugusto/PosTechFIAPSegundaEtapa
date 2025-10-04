@@ -52,13 +52,6 @@ app.use('/users', UsersRouter);
 
 app.use(ErrorController);
 
-app.use((err, req, res) => { // É importante que ele tenha 4 argumentos
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    res.status(err.status || 500);
-    res.render('error');
-});
-
 async function bootstrapDatabase() {
     try {
         console.log('Iniciando o bootstrap do banco de dados em segundo plano...');

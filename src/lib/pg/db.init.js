@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
-import { UserEntity } from '../../entities/user.entity.js';
-import { PostEntity } from '../../entities/post.entity.js';
+import { UserSchema } from '../../entities/user.entity.js';
+import { PostSchema } from '../../entities/post.entity.js';
+
 import pg from 'pg';
 
 const DATABASE_NAME = process.env.POSTGRES_DB;
@@ -24,8 +25,8 @@ const dataSourceOptions = {
     synchronize: true,
     logging: process.env.ENVIRONMENT === 'development' ? ['query', 'error'] : ['error'],
     entities: [
-        UserEntity,
-        PostEntity,
+        UserSchema,
+        PostSchema,
     ],
 };
 

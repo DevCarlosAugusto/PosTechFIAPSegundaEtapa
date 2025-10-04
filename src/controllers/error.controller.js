@@ -1,17 +1,38 @@
-// Importa o http-errors para criar os erros, se necessário em alguma rota
-// TODO: Criar Funções 'next' para utilizar o 'CreateError'
-// import createError from 'http-errors';
+// eslint-disable-next-line
+const ErrorController = (err, req, res, next) => {
+    console.error('--- ERRO CAPTURADO PELO CONTROLLER ---');
+    console.error(`Status: ${err.status || err.statusCode || 500}`);
+    console.error('Mensagem:', err.message);
 
-const ErrorController = (err, req, res) => {
-  const status = err.status || 500;
-  const message = err.message || 'Erro interno do servidor';
+    const isClientError = (err.status >= 400 && err.status < 500) || (err.statusCode >= 400 && err.statusCode < 500);
 
-  res.status(status).json({
-    error: {
-      status,
-      message
+    if (isClientError) {
+        const status = err.statusCode || err.status || 400;
+
+        if (err.details) {
+            return res.status(status).json({
+                status: 'error',
+                message: err.message,
+                errors: err.details,
+            });
+        }
+
+        return res.status(status).json({
+            status: 'error',
+            message: err.message,
+        });
     }
-  });
+
+
+    const statusCode = err.status || 500;
+    const message = statusCode === 500 && req.app.get('env') !== 'development'
+        ? 'Erro interno do servidor.'
+        : err.message;
+
+    return res.status(statusCode).json({
+        status: 'error',
+        message: message,
+    });
 };
 
 export default ErrorController;
