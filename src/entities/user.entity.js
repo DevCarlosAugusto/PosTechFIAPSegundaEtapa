@@ -17,7 +17,7 @@ export class UserEntity {
 export const UserSchema = new EntitySchema({
     name: 'UserEntity',
     tableName: 'users',
-    target: UserEntity, // Vincula o esquema à classe UserEntity
+    target: UserEntity,
     columns: {
         id: {
             type: Number,

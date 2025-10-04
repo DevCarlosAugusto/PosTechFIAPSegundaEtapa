@@ -19,7 +19,6 @@ function setupSwagger(app) {
         }
       }
     },
-    // Ajuste os globs conforme sua estrutura real:
     apis: [
       './app.js',
       './src/**/*.js'
@@ -28,10 +27,7 @@ function setupSwagger(app) {
 
   const swaggerSpec = swaggerJSDoc(options);
 
-  // JSON bruto (útil pra CI)
   app.get('/swagger.json', (_req, res) => res.json(swaggerSpec));
-
-  // UI
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 }
 

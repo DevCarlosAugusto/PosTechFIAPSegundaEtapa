@@ -1,4 +1,3 @@
-// PostsControllers.js
 import PostModel from '../models/post.model.js';
 
 /**
@@ -56,8 +55,7 @@ import PostModel from '../models/post.model.js';
 const PostsController = {
   async getAllPosts(req, res) {
     try {
-      // TO DO:
-      // Adicionar retorno personalizado para perfil de professor e perfil de aluno 
+      // TODO: Adicionar retorno personalizado para perfil de professor e perfil de aluno
       if (req.user.perfil === 'professor') {
         const posts = await PostModel.findAll();
         res.json(posts);

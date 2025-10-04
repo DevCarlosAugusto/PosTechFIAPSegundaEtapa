@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-// É crucial importar o AppDataSource do db.init.js
+
 import { AppDataSource } from '../lib/pg/db.init.js';
 import { UserEntity } from '../entities/user.entity.js';
 
@@ -78,7 +78,7 @@ class UserRepository {
     async update(id, updateData) {
         if (updateData.password) {
             updateData.password_hash = await this.hashPassword(updateData.password);
-            delete updateData.password; // Remove o campo password em texto claro
+            delete updateData.password;
         }
 
         const user = await this.repository.findOne({ where: { id } });

@@ -1,5 +1,3 @@
-// TODO: Criar Funções 'next' para utilizar o 'CreateError'
-// import createError from 'http-errors';
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -14,18 +12,18 @@ import setupSwagger from './src/swagger.js';
 import AuthRouter from './src/routes/auth.js';
 import HomeRouter from './src/routes/home.js';
 import UsersRouter from './src/routes/users.js';
-// import PostsRouter from './src/routes/posts.js';
+import PostsRouter from './src/routes/posts.js';
 import ErrorController from './src/controllers/error.controller.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-let isDbReady = false; // Estado para controlar se o DB está pronto
+let isDbReady = false;
 
 app.use((req, res, next) => {
     if (isDbReady) {
-        next(); // DB pronto, segue para as rotas
+        next();
     } else {
         res.status(503).json({
             status: 'error',
@@ -48,7 +46,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 app.use('/', HomeRouter);
 app.use('/auth', AuthRouter);
 app.use('/users', UsersRouter);
-// app.use('/posts', PostsRouter);
+app.use('/posts', PostsRouter);
 
 app.use(ErrorController);
 
