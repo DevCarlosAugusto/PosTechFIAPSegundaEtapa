@@ -3,7 +3,6 @@ import debug from 'debug';
 import http from 'http';
 import dotenv from 'dotenv';
 
-
 dotenv.config();
 
 let port = normalizePort(process.env.PORT || '3000');
@@ -63,12 +62,12 @@ function onListening() {
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
 
-    const yellow = '\x1b[38;2;129;201;149m';
+    const green = '\x1b[38;2;129;201;149m';
     const reset = '\x1b[0m';
     const originalConsoleInfo = console.info;
 
     console.info = (message, ...args) => {
-        originalConsoleInfo.call(console, `${yellow}${message}${reset}`, ...args);
+        originalConsoleInfo.call(console, `${green}${message}${reset}`, ...args);
     };
 
     console.info(`Listening on http://localhost:${bind}`);

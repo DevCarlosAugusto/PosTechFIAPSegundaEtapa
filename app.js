@@ -6,6 +6,9 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+
+import { initializeDatabase, createTables } from './src/lib/pg/db.init.js';
+
 import setupSwagger from './src/swagger.js';
 
 import AuthRouter from './src/routes/auth.js';
@@ -18,6 +21,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+let isDbReady = false; // Estado para controlar se o DB está pronto
+
+app.use((req, res, next) => {
+    if (isDbReady) {
+        next(); // DB pronto, segue para as rotas
+    } else {
+        res.status(503).json({
+            status: 'error',
+            message: 'O servidor está iniciando. O banco de dados está sendo configurado. Tente novamente em alguns segundos.'
+        });
+    }
+});
 
 setupSwagger(app);
 
@@ -35,15 +50,30 @@ app.use('/auth', AuthRouter);
 app.use('/users', UsersRouter);
 app.use('/posts', PostsRouter);
 
-// Middlewares / controllers de erro específicos
 app.use(ErrorController);
 
-// handler de erro final precisa do `next`
-app.use((err, req, res) => {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  res.status(err.status || 500);
-  res.render('error');
+app.use((err, req, res) => { // É importante que ele tenha 4 argumentos
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    res.status(err.status || 500);
+    res.render('error');
 });
+
+async function bootstrapDatabase() {
+    try {
+        console.log('Iniciando o bootstrap do banco de dados em segundo plano...');
+
+        await initializeDatabase();
+        await createTables();
+
+        isDbReady = true;
+        console.log('✅ Bootstrap do banco de dados concluído com sucesso. Servidor liberado para requisições.');
+
+    } catch (error) {
+        console.error('❌ ERRO CRÍTICO no bootstrap: Falha na inicialização do DB. O servidor permanecerá indisponível.', error);
+    }
+}
+
+bootstrapDatabase();
 
 export default app;

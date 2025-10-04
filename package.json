@@ -5,12 +5,12 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "npm run lint && cross-env ENVIRONMENT=development nodemon src/server.js",
+    "dev": "npm run lint && dotenv -e .env -e .env.development nodemon src/server.js",
     "dev:watch": "npm run lint && node src/server.js",
     "jsdocs": "jsdoc /src -r",
     "lint": "eslint . --ext .js",
     "test": "vitest",
-    "start": "cross-env ENVIRONMENT=production node src/server.js"
+    "start": "dotenv -e .env -e .env.production node src/server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
