@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-let port = normalizePort(process.env.PORT || process.env.APP_PORT || '3000');
+let port = normalizePort(process.env.PORT || '3000');
 
 app.set('port', port);
 
@@ -23,59 +23,58 @@ server.on('listening', onListening);
 server.listen(port, '0.0.0.0');
 
 function normalizePort(val) {
-	let port = parseInt(val, 10);
+    let port = parseInt(val, 10);
 
-	if (isNaN(port)) {
-		
-		return val;
-	}
+    if (isNaN(port)) {
 
-	if (port >= 0) {
-		
-		return port;
-	}
+        return val;
+    }
 
-	return false;
+    if (port >= 0) {
+
+        return port;
+    }
+
+    return false;
 }
 
 function onError(error) {
-	if (error.syscall !== 'listen') {
-		throw error;
-	}
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
 
-	let bind = typeof port === 'string'
-		? 'Pipe ' + port
-		: 'Port ' + port;
+    let bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
 
-	switch (error.code) {
-		case 'EACCES':
-			console.error(bind + ' requires elevated privileges');
-			process.exit(1);
-			break;
-		case 'EADDRINUSE':
-			console.error(bind + ' is already in use');
-			process.exit(1);
-			break;
-		default:
-			throw error;
-	}
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
 }
 
-
 function onListening() {
-	let addr = server.address();
-	let bind = typeof addr === 'string'
-		? 'pipe ' + addr
-		: 'port ' + addr.port;
-	debug('Listening on ' + bind);
+    let addr = server.address();
+    let bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
 
-	const yellow = '\x1b[38;2;129;201;149m';
-	const reset = '\x1b[0m';
-	const originalConsoleInfo = console.info;
+    const yellow = '\x1b[38;2;129;201;149m';
+    const reset = '\x1b[0m';
+    const originalConsoleInfo = console.info;
 
-	console.info = (message, ...args) => {
-		originalConsoleInfo.call(console, `${yellow}${message}${reset}`, ...args);
-	};
+    console.info = (message, ...args) => {
+        originalConsoleInfo.call(console, `${yellow}${message}${reset}`, ...args);
+    };
 
-	console.info(`cListening on http://localhost:${bind}`);
+    console.info(`Listening on http://localhost:${bind}`);
 }

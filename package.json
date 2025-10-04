@@ -5,12 +5,12 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --exec 'npm run dev:watch'",
+    "dev": "npm run lint && cross-env ENVIRONMENT=development nodemon src/server.js",
     "dev:watch": "npm run lint && node src/server.js",
     "jsdocs": "jsdoc /src -r",
     "lint": "eslint . --ext .js",
     "test": "vitest",
-    "start": "node src/server.js"
+    "start": "cross-env ENVIRONMENT=production node src/server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -36,6 +36,8 @@
     "@eslint/js": "^9.36.0",
     "@eslint/json": "^0.13.2",
     "@eslint/markdown": "^7.2.0",
+    "cross-env": "^10.1.0",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.36.0",
     "globals": "^16.4.0",
     "jsdoc": "^4.0.4",
