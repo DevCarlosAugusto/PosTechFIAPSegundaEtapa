@@ -1,5 +1,5 @@
 import PostsController from '../controllers/posts.controller.js';
-import { withDbInit } from '../middleware/withDbInit.js';
+// import { withDbInit } from '../middleware/withDbInit.js';
 import { Router } from 'express';
 import { autenticar } from '../middleware/auth.js';
 
