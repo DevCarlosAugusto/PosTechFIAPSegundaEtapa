@@ -6,23 +6,19 @@ import createError from 'http-errors';
  */
 
 /**
- * Lida com o registro (Criação) de um novo usuário. (POST /users/register)
+ * @description Lida com o registro (Criação) de um novo usuário. (POST /users/register)
  * @type {RequestHandler}
  */
 export const registerUser = async (req, res, next) => {
     try {
         const userData = UserCreationSchema.parse(req.body);
 
-        // 2. Verificação de Usuário Existente
         const existingUser = await UserRepository.findByEmail(userData.email);
         if (existingUser) {
             return next(createError(409, 'O email fornecido já está em uso.'));
         }
 
-        // 3. Criação do Usuário (inclui hashing da senha no Model)
         const newUser = await UserRepository.create(userData);
-
-        // Remove o hash da senha antes de enviar a resposta
         const userResponse = {
             id: newUser.id,
             nome: newUser.nome,
@@ -32,14 +28,12 @@ export const registerUser = async (req, res, next) => {
             subject: newUser.subject
         };
 
-        // 4. Resposta de Sucesso (201 Created)
         res.status(201).json({
             message: 'Usuário registrado com sucesso!',
             user: userResponse,
         });
 
     } catch (error) {
-        // Lida com erros de validação do Zod
         if (error.name === 'ZodError') {
             const formattedErrors = error.errors.map(err => ({
                 path: err.path.join('.'),
@@ -54,15 +48,15 @@ export const registerUser = async (req, res, next) => {
 };
 
 /**
- * Lida com a listagem de todos os usuários. (GET /users)
+ * @description Lida com a listagem de todos os usuários. (GET /users)
  * @type {RequestHandler}
  */
 export const listAllUsers = async (req, res, next) => {
     try {
         const users = await UserRepository.findAll();
-        // Mapeia para remover o password_hash de todos os usuários
         const usersResponse = users.map(user => {
-            const { /*password_hash, */...userPublic } = user;
+            // eslint-disable-next-line
+            const { password_hash, ...userPublic } = user;
             return userPublic;
         });
         res.json(usersResponse);
@@ -73,7 +67,7 @@ export const listAllUsers = async (req, res, next) => {
 };
 
 /**
- * Lida com a busca de um usuário pelo ID. (GET /users/:id)
+ * @description Lida com a busca de um usuário pelo ID. (GET /users/:id)
  * @type {RequestHandler}
  */
 export const getUserById = async (req, res, next) => {
@@ -87,8 +81,8 @@ export const getUserById = async (req, res, next) => {
             return next(createError(404, 'Usuário não encontrado.'));
         }
 
-        // Remove o hash da senha antes de enviar
-        const { /*password_hash, */...userResponse } = user;
+        // eslint-disable-next-line
+        const { password_hash, ...userResponse } = user;
         res.json(userResponse);
     } catch (error) {
         console.error("Erro ao buscar usuário por ID:", error.message);
@@ -97,8 +91,8 @@ export const getUserById = async (req, res, next) => {
 };
 
 /**
- * Lida com a atualização de um usuário pelo ID. (PUT /users/:id)
- * Implementação simplificada: requer validação Zod adicional para updates se necessário.
+ * @description Lida com a atualização de um usuário pelo ID. (PUT /users/:id)
+ * @description Implementação simplificada: requer validação Zod adicional para updates se necessário.
  * @type {RequestHandler}
  */
 export const updateUser = async (req, res, next) => {
@@ -106,12 +100,9 @@ export const updateUser = async (req, res, next) => {
         const id = parseInt(req.params.id);
         if (isNaN(id)) return next(createError(400, 'ID de usuário inválido.'));
 
-        // Validação básica para os campos que podem ser atualizados
         const { nome, user_type, serie, subject } = req.body;
-
         const updateData = { nome, user_type, serie, subject };
 
-        // Remove campos nulos/indefinidos do objeto de atualização
         Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
         if (Object.keys(updateData).length === 0) {
@@ -124,19 +115,18 @@ export const updateUser = async (req, res, next) => {
             return next(createError(404, 'Usuário não encontrado para atualização.'));
         }
 
-        // Remove o hash da senha antes de enviar
-        const { /*password_hash, */...userResponse } = updatedUser;
+        // eslint-disable-next-line
+        const { password_hash, ...userResponse } = updatedUser;
         res.json({ message: 'Usuário atualizado com sucesso.', user: userResponse });
 
     } catch (error) {
-        // Tratar erros de TypeORM (ex: violação de constraint) aqui
         console.error("Erro ao atualizar usuário:", error.message);
         next(createError(500, 'Falha interna ao atualizar usuário.'));
     }
 };
 
 /**
- * Lida com a remoção de um usuário pelo ID. (DELETE /users/:id)
+ * @description Lida com a remoção de um usuário pelo ID. (DELETE /users/:id)
  * @type {RequestHandler}
  */
 export const deleteUser = async (req, res, next) => {
@@ -150,7 +140,7 @@ export const deleteUser = async (req, res, next) => {
             return next(createError(404, 'Usuário não encontrado para exclusão.'));
         }
 
-        res.status(204).send(); // 204 No Content para sucesso na exclusão
+        res.status(204).send();
     } catch (error) {
         console.error("Erro ao deletar usuário:", error.message);
         next(createError(500, 'Falha interna ao deletar usuário.'));

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-// Note: registerUser e as funções CRUD foram movidas para users.controller.js
+import { authenticateToken /*, checkRole*/ } from '../middleware/auth.middleware.js';
 import {
     registerUser,
     listAllUsers,
@@ -10,15 +10,11 @@ import {
 
 const router = Router();
 
-/**
- * Rota POST para registro de novo usuário.
- * POST /users/register
- */
 router.post('/register', registerUser);
 
-router.get('/', listAllUsers);
-router.get('/:id', getUserById);
-router.put('/:id', updateUser);
-router.delete('/:id', deleteUser);
+router.get('/', authenticateToken, listAllUsers);
+router.get('/:id', authenticateToken, getUserById);
+router.put('/:id', authenticateToken, updateUser);
+router.delete('/:id', authenticateToken, deleteUser);
 
 export default router;
