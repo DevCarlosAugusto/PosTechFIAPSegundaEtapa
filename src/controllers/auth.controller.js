@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import User from '../models/User.js';
+import User from '../models/user.js';
 
 const SECRET = process.env.JWT_SECRET || 'segredo-super-seguro';
 

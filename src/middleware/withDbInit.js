@@ -1,5 +1,5 @@
 // src/middleware/withDbInit.js
-import { ensureSchema, isInitError } from '../../database/database.controller.js';
+import { ensureSchema, isInitError } from '../controllers/database.controller.js';
 
 let initPromise = null; // lock p/ evitar corrida
 

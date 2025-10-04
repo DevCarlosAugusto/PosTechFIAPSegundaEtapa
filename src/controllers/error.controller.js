@@ -2,7 +2,7 @@
 // TODO: Criar Funções 'next' para utilizar o 'CreateError'
 // import createError from 'http-errors';
 
-const ErrorController = (err, req, res, next) => {
+const ErrorController = (err, req, res) => {
   const status = err.status || 500;
   const message = err.message || 'Erro interno do servidor';
 

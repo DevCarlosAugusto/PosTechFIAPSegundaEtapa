@@ -9,13 +9,13 @@ import { dirname } from 'path';
 import setupSwagger from './src/swagger.js';
 
 import authRouter from './src/routes/auth.js';
-import indexRouter from './src/routes/index.js';
+import indexRouter from './src/routes/home.js';
 import usersRouter from './src/routes/users.js';
 import postsRouter from './src/routes/posts.js';
-import ErrorController from './src/controllers/ErrorController.js';
+import ErrorController from './src/controllers/error.controller.js';
 
 // importe o setup do DB
-import { setupDatabase } from './database/database.controller.js';
+import { setupDatabase } from './src/controllers/database.controller.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -45,7 +45,7 @@ app.get('/setup-db', setupDatabase);
 app.use(ErrorController);
 
 // handler de erro final precisa do `next`
-app.use((err, req, res, _next) => {
+app.use((err, req, res) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   res.status(err.status || 500);

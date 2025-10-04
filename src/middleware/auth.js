@@ -11,6 +11,6 @@ export function autenticar(req, res, next) {
     req.user = payload; // agora você tem acesso ao tipo de usuário
     next();
   } catch (error) {
-    return res.status(403).json({ error: 'Token inválido ou expirado.' });
+    return res.status(403).json({ ...error, error: 'Token inválido ou expirado.' });
   }
 }
