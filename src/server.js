@@ -12,14 +12,9 @@ app.set('port', port);
 
 let server = http.createServer(app);
 
-
-
-// server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-
-// escute em 0.0.0.0 para expor no host
 server.listen(port, '0.0.0.0');
 
 function normalizePort(val) {
