@@ -1,349 +1,155 @@
-import PostModel from '../models/post.model.js';
+import PostRepository, { PostCreationSchema, PostUpdateSchema } from '../models/post.model.js';
+import createError from 'http-errors';
 
 /**
- * @openapi
- * components:
- *   schemas:
- *     PostModel:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           example: 1
- *         title:
- *           type: string
- *           example: "Meu primeiro post"
- *         content:
- *           type: string
- *           example: "Conteúdo do post..."
- *         createdAt:
- *           type: string
- *           format: date-time
- *           example: "2025-09-28T12:34:56.000Z"
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           example: "2025-09-28T12:34:56.000Z"
- *     Error:
- *       type: object
- *       properties:
- *         error:
- *           type: string
- *           example: "Mensagem de erro"
+ * @typedef {import('express').RequestHandler} RequestHandler
  */
 
-/**
- * @openapi
- * /posts:
- *   get:
- *     summary: Lista todos os posts
- *     tags: [Posts]
- *     responses:
- *       200:
- *         description: Lista de posts
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items: { $ref: '#/components/schemas/PostModel' }
- *       500:
- *         description: Erro ao buscar posts
- *         content:
- *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
- */
-const PostsController = {
-  async getAllPosts(req, res) {
-    try {
-      // TODO: Adicionar retorno personalizado para perfil de professor e perfil de aluno
-      if (req.user.perfil === 'professor') {
-        const posts = await PostModel.findAll();
-        res.json(posts);
-      } else {
-        const posts = await PostModel.findAll();
-        res.json(posts);
-      }
-      
-    } catch (error) {
-      console.error('Erro ao buscar posts:', error);
-      res.status(500).json({ error: `Erro ao buscar posts ${error.message}` });
-    }
-  },
-
-  /**
-   * @openapi
-   * /posts/{id}:
-   *   get:
-   *     summary: Busca um post por ID
-   *     tags: [Posts]
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema: { type: integer }
-   *         description: ID do post
-   *     responses:
-   *       200:
-   *         description: PostModel encontrado
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/PostModel' }
-   *       404:
-   *         description: PostModel não encontrado
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   *       500:
-   *         description: Erro ao buscar post
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   */
-  async getPostById(req, res) {
-    try {
-      const id = parseInt(req.params.id, 10);
-      const post = await PostModel.findById(id);
-      if (!post) return res.status(404).json({ error: 'PostModel não encontrado' });
-      res.json(post);
-    } catch (error) {
-      console.error('Erro ao buscar post:', error);
-      res.status(500).json({ error: `Erro ao buscar post ${error.message}` });
-    }
-  },
-
-  /**
-   * @openapi
-   * /posts:
-   *   post:
-   *     summary: Cria um novo post
-   *     tags: [Posts]
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               titulo:
-   *                 type: string
-   *                 description: Título do post
-   *                 example: Meu novo post
-   *               conteudo:
-   *                 type: string
-   *                 description: Conteúdo do post
-   *                 example: Este é o conteúdo do post
-   *               autor_id:
-   *                 type: integer
-   *                 description: ID do autor do post
-   *                 example: 1
-   *     responses:
-   *       201:
-   *         description: PostModel criado com sucesso
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/PostModel' }
-   *       400:
-   *         description: Campos obrigatórios ausentes
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   *       500:
-   *         description: Erro ao criar post
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   */
-  async createPost(req, res) {
-    const { titulo, conteudo, autor_id } = req.body;
-
-    if (!titulo || !conteudo || !autor_id) {
-      return res.status(400).json({ error: 'Campos obrigatórios: titulo, conteudo, autor_id.' });
-    }
-
-    try {
-      const novoPost = await PostModel.create({ titulo, conteudo, autor_id });
-      res.status(201).json(novoPost);
-    } catch (error) {
-      console.error('Erro ao criar post:', error);
-      if (error.code === '23503' && error.constraint === 'posts_autor_id_fkey') {
-        return res.status(400).json({ error: 'O autor informado não existe. Verifique o campo autor_id.' });
-      }
-      res.status(500).json({ error: `Erro ao criar post: ${error.message}` });
-    }
-  },
-
-  /**
-   * @openapi
-   * /posts/{id}:
-   *   put:
-   *     summary: Atualiza um post existente
-   *     tags: [Posts]
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *         description: ID do post a ser atualizado
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               titulo:
-   *                 type: string
-   *                 description: Novo título do post
-   *                 example: Título atualizado
-   *               conteudo:
-   *                 type: string
-   *                 description: Novo conteúdo do post
-   *                 example: Conteúdo atualizado
-   *     responses:
-   *       200:
-   *         description: PostModel atualizado com sucesso
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/PostModel' }
-   *       400:
-   *         description: Campos obrigatórios ausentes
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   *       404:
-   *         description: PostModel não encontrado
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   *       500:
-   *         description: Erro ao atualizar post
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   */
-  async updatePost(req, res) {
-    const id = parseInt(req.params.id, 10);
-    const { titulo, conteudo } = req.body;
-
-    if (!titulo || !conteudo) {
-      return res.status(400).json({ error: 'Campos obrigatórios: titulo, conteudo.' });
-    }
-
-    if (req.user.perfil === 'aluno') {
-      if (req.user.id != id) {
-        return res.status(401).json({ error: 'Sem permissão para alteração do post.' });
-      }
-    }
-
-    try {
-      const postAtualizado = await PostModel.update(id, { titulo, conteudo });
-      if (!postAtualizado) return res.status(404).json({ error: 'PostModel não encontrado.' });
-      res.json(postAtualizado);
-    } catch (error) {
-      console.error('Erro ao atualizar post:', error);
-      if (error.code === '23503' && error.constraint === 'posts_autor_id_fkey') {
-        return res.status(400).json({ error: 'O autor informado não existe. Verifique o campo autor_id.' });
-      }
-      res.status(500).json({ error: `Erro ao atualizar post: ${error.message}` });
-    }
-  },
-
-  /**
-   * @openapi
-   * /posts/{id}:
-   *   delete:
-   *     summary: Exclui um post por ID
-   *     tags: [Posts]
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *         description: ID do post a ser excluído
-   *     responses:
-   *       200:
-   *         description: PostModel excluído com sucesso
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: PostModel com ID 1 foi excluído com sucesso.
-   *       404:
-   *         description: PostModel não encontrado
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   *       500:
-   *         description: Erro ao excluir post
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   */
-  async deletePost(req, res) {
-    const id = parseInt(req.params.id, 10);
-
-    try {
-      const sucesso = await PostModel.remove(id);
-      if (!sucesso) return res.status(404).json({ error: 'PostModel não encontrado.' });
-      res.status(200).json({ message: `Post com ID ${id} foi excluído com sucesso.` });
-    } catch (error) {
-      console.error('Erro ao excluir post:', error);
-      res.status(500).json({ error: `Erro ao excluir post: ${error.message}` });
-    }
-  },
-
-  /**
-   * @openapi
-   * /posts/search:
-   *   get:
-   *     summary: Busca posts por palavra-chave
-   *     tags: [Posts]
-   *     parameters:
-   *       - in: query
-   *         name: palavraChave
-   *         required: true
-   *         schema:
-   *           type: string
-   *         description: Palavra-chave para busca
-   *     responses:
-   *       200:
-   *         description: Resultados da busca
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items: { $ref: '#/components/schemas/PostModel' }
-   *       400:
-   *         description: Parâmetro de busca ausente
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   *       500:
-   *         description: Erro ao buscar posts
-   *         content:
-   *           application/json:
-   *             schema: { $ref: '#/components/schemas/Error' }
-   */
-  async searchPosts(req, res) {
-    const termo = req.query.palavraChave;
-
-    if (!termo) {
-      return res.status(400).json({ error: 'Parâmetro de busca "palavraChave" é obrigatório.' });
-    }
-
-    try {
-      const resultados = await PostModel.search(termo);
-      res.json(resultados);
-    } catch (error) {
-      console.error('Erro ao buscar posts:', error);
-      res.status(500).json({ error: `Erro ao buscar posts: ${error.message}` });
-    }
-  }
+const formatZodErrors = (error) => {
+    return error.errors.map(err => ({
+        path: err.path.join('.'),
+        message: err.message,
+    }));
 };
 
-export default PostsController;
+/**
+ * @description Lida com a criação de um novo post. (POST /posts)
+ * @type {RequestHandler}
+ */
+export const createPost = async (req, res, next) => {
+    try {
+        const created_by_id = req.user.id;
+        const postData = PostCreationSchema.parse({ ...req.body, created_by_id });
+        const newPost = await PostRepository.create(postData);
+
+        res.status(201).json({
+            message: 'Post criado com sucesso!',
+            post: newPost,
+        });
+    } catch (error) {
+        if (error.name === 'ZodError') {
+            return next(createError(400, 'Dados de entrada inválidos.', { details: formatZodErrors(error) }));
+        }
+
+        console.error("Erro ao criar post:", error.message);
+        next(createError(500, 'Falha interna ao criar o post.'));
+    }
+};
+
+/**
+ * @description Lida com a listagem de todos os posts. (GET /posts)
+ * @type {RequestHandler}
+ */
+export const getAllPosts = async (req, res, next) => {
+    try {
+        const posts = await PostRepository.findAll();
+        res.json(posts);
+    } catch (error) {
+        console.error("Erro ao listar posts:", error.message);
+        next(createError(500, 'Falha interna ao buscar posts.'));
+    }
+};
+
+/**
+ * @description Lida com a busca de um post pelo ID. (GET /posts/:id)
+ * @type {RequestHandler}
+ */
+export const getPostById = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) return next(createError(400, 'ID de post inválido.'));
+
+        const post = await PostRepository.findById(id);
+
+        if (!post) {
+            return next(createError(404, 'Post não encontrado.'));
+        }
+
+        res.json(post);
+    } catch (error) {
+        console.error("Erro ao buscar post por ID:", error.message);
+        next(createError(500, 'Falha interna ao buscar o post.'));
+    }
+};
+
+/**
+ * @description Lida com a atualização de um post pelo ID. (PUT /posts/:id)
+ * @type {RequestHandler}
+ */
+export const updatePost = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        if (isNaN(id)) return next(createError(400, 'ID de post inválido.'));
+
+        const edited_by_id = req.user.id;
+        const validatedUpdateData = PostUpdateSchema.parse(req.body);
+        const updateData = { ...validatedUpdateData, edited_by_id };
+        const updatedPost = await PostRepository.update(id, updateData);
+
+        if (!updatedPost) {
+            return next(createError(404, 'Post não encontrado para atualização.'));
+        }
+
+        res.json({ message: 'Post atualizado com sucesso.', post: updatedPost });
+
+    } catch (error) {
+        if (error.name === 'ZodError') {
+            return next(createError(400, 'Dados de entrada inválidos.', { details: formatZodErrors(error) }));
+        }
+
+        console.error("Erro ao atualizar post:", error.message);
+        next(createError(500, 'Falha interna ao atualizar o post.'));
+    }
+};
+
+/**
+ * @description Lida com a remoção de um post pelo ID. (DELETE /posts/:id)
+ * @type {RequestHandler}
+ */
+export const deletePost = async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) return next(createError(400, 'ID de post inválido.'));
+
+        const wasRemoved = await PostRepository.remove(id);
+
+        if (!wasRemoved) {
+            return next(createError(404, 'Post não encontrado para exclusão.'));
+        }
+
+        res.status(204).send();
+    } catch (error) {
+        console.error("Erro ao deletar post:", error.message);
+        next(createError(500, 'Falha interna ao deletar o post.'));
+    }
+};
+
+/**
+ * @description Lida com a busca de posts por palavra-chave. (GET /posts/search?termo=...)
+ * @type {RequestHandler}
+ */
+export const searchPosts = async (req, res, next) => {
+    try {
+        const termo = req.query.termo;
+
+        if (!termo || typeof termo !== 'string' || termo.trim() === '') {
+            return next(createError(400, 'O parâmetro de busca "termo" é obrigatório.'));
+        }
+
+        const resultados = await PostRepository.search(termo);
+
+        res.json(resultados);
+    } catch (error) {
+        console.error("Erro ao buscar posts:", error.message);
+        next(createError(500, 'Falha interna ao buscar posts.'));
+    }
+};
+
+export default {
+    createPost,
+    getAllPosts,
+    getPostById,
+    updatePost,
+    deletePost,
+};

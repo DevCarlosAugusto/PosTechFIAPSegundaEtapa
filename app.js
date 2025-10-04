@@ -60,6 +60,16 @@ async function bootstrapDatabase() {
         isDbReady = true;
         console.log('✅ Bootstrap do banco de dados concluído com sucesso. Servidor liberado para requisições.');
 
+        const green = '\x1b[38;2;129;201;149m';
+        const reset = '\x1b[0m';
+        const originalConsoleInfo = console.info;
+
+        console.info = (message, ...args) => {
+            originalConsoleInfo.call(console, `${green}${message}${reset}`, ...args);
+        };
+
+        console.info(`Listening on http://localhost:${process.env.PORT || '3000'}`);
+
     } catch (error) {
         console.error('❌ ERRO CRÍTICO no bootstrap: Falha na inicialização do DB. O servidor permanecerá indisponível.', error);
     }

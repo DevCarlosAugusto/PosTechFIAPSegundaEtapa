@@ -1,80 +1,107 @@
-import { query } from '../database/db.js';
+import { z } from 'zod';
 
-const PostModel = {
-  async findAll() {
-    console.log('Método findAll foi chamado'); 
-    const result = await query(`
-      SELECT 
-        posts.*, 
-        usuarios.nome AS autor_nome
-      FROM 
-        posts
-      JOIN usuarios 
-        ON posts.autor_id = usuarios.id
-    `);
-    return result.rows;
-  },
+import { AppDataSource } from '../lib/pg/db.init.js';
+import { PostEntity } from '../entities/post.entity.js';
+import { Like } from 'typeorm';
 
-  async findById(id) {
-    const result = await query(`
-      SELECT 
-        posts.*, 
-        usuarios.nome AS autor_nome
-      FROM 
-        posts
-      JOIN usuarios 
-        ON posts.autor_id = usuarios.id
-      WHERE 
-        posts.id = $1
-    `, [id]);
-    return result.rows[0];
-  },
+/**
+ * @description Schema para criação de um novo post (POST /posts).
+ * @description O 'created_by_id' será injetado pelo controller via 'req.user.id'.
+ */
+export const PostCreationSchema = z.object({
+    title: z.string().min(1, 'O título é obrigatório.').max(100, 'O título deve ter no máximo 100 caracteres.'),
+    content: z.string().min(1, 'O conteúdo é obrigatório.'),
+    created_by_id: z.number().int().positive('O ID do autor deve ser um número inteiro positivo.'),
+});
 
-  async create({ titulo, conteudo, autor_id }) {
-    const result = await query(`
-      INSERT INTO posts (titulo, conteudo, autor_id)
-      VALUES ($1, $2, $3)
-      RETURNING id, titulo, conteudo, autor_id
-    `, [titulo, conteudo, autor_id]);
+/**
+ * @description Schema para atualização de um post existente (PUT /posts/:id).
+ * @description O 'edited_by_id' será injetado pelo controller via 'req.user.id'.
+ */
+export const PostUpdateSchema = z.object({
+    title: z.string().min(1).max(100).optional(),
+    content: z.string().min(1).optional(),
+    edited_by_id: z.number().int().positive().optional(),
+}).refine(data => Object.keys(data).length > 0, {
+    message: "Nenhum dado válido fornecido para atualização."
+});
 
-    return result.rows[0];
-  },
+class PostRepository {
+    get repository() {
+        if (!AppDataSource || !AppDataSource.isInitialized) {
+            console.error('ERRO: AppDataSource não inicializado! Execute initializeDatabase() primeiro.');
+            throw new Error('Database connection not initialized.');
+        }
+        return AppDataSource.getRepository(PostEntity);
+    }
 
-  async update(id, { titulo, conteudo }) {
-    const result = await query(`
-      UPDATE posts
-      SET titulo = $1, conteudo = $2
-      WHERE id = $3
-      RETURNING id, titulo, conteudo, autor_id
-    `, [titulo, conteudo, id]);
+    /**
+     * @description Cria um novo post.
+     * @param {z.infer<typeof PostCreationSchema>} postData
+     */
+    async create(postData) {
+        const post = this.repository.create(postData);
+        return this.repository.save(post);
+    }
 
-    return result.rows[0];
-  },
+    /**
+     * @description Busca todos os posts (inclui dados do autor).
+     */
+    async findAll() {
+        return this.repository.find({
+            relations: ['created_by'],
+            order: { created_at: 'DESC' }
+        });
+    }
 
-  async remove(id) {
-    const result = await query(`
-      DELETE FROM posts
-      WHERE id = $1
-    `, [id]);
+    /**
+     * @description Busca um post pelo ID (inclui dados do autor).
+     * @param {number} id
+     */
+    async findById(id) {
+        return this.repository.findOne({
+            where: { id },
+            relations: ['created_by']
+        });
+    }
 
-    return result.rowCount > 0;
-  },
+    /**
+     * @description Atualiza dados de um post.
+     * @param {number} id
+     * @param {object} updateData - Dados a serem atualizados (inclui edited_by_id).
+     */
+    async update(id, updateData) {
+        const post = await this.repository.findOne({ where: { id } });
 
-  async search(termo) {
-    const result = await query(`
-      SELECT 
-        posts.*, 
-        usuarios.nome AS autor_nome
-      FROM posts
-      JOIN usuarios 
-        ON posts.autor_id = usuarios.id
-      WHERE 
-        posts.titulo ILIKE $1 
-        OR posts.conteudo ILIKE $1
-    `, [`%${termo}%`]);
+        if (!post) return null;
 
-    return result.rows;
-  }
-};
+        this.repository.merge(post, updateData);
+        return this.repository.save(post);
+    }
 
-export default PostModel;
+    /**
+     * @description Remove um post pelo ID.
+     * @param {number} id
+     */
+    async remove(id) {
+        const result = await this.repository.delete(id);
+        return result.affected > 0;
+    }
+
+    /**
+     * @description Busca posts por uma palavra-chave no título ou conteúdo.
+     * @param {string} termo - Palavra-chave para busca.
+     */
+    async search(termo) {
+        return this.repository.find({
+            where: [
+                { title: Like(`%${termo}%`) },
+                { content: Like(`%${termo}%`) }
+            ],
+            relations: ['created_by'],
+            order: { created_at: 'DESC' }
+        });
+    }
+}
+
+export default new PostRepository();

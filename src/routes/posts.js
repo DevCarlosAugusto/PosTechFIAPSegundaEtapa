@@ -1,14 +1,22 @@
-// import PostsController from '../controllers/posts.controller.js';
 import { Router } from 'express';
-// import { autenticar } from '../middleware/auth.middleware.js';
+import { authenticateToken , checkRole } from '../middleware/auth.middleware.js';
+import {
+    createPost,
+    getAllPosts,
+    getPostById,
+    updatePost,
+    searchPosts,
+    deletePost
+} from '../controllers/posts.controller.js';
 
 const router = Router();
 
-// router.get("/", autenticar, withDbInit(PostsController.getAllPosts));
-// router.get("/search", autenticar, withDbInit(PostsController.searchPosts));
-// router.get("/:id", autenticar, withDbInit(PostsController.getPostById));
-// router.post("/", autenticar, withDbInit(PostsController.createPost));
-// router.put("/:id", autenticar, withDbInit(PostsController.updatePost));
-// router.delete("/:id", autenticar, withDbInit(PostsController.deletePost));
+router.get('/', getAllPosts);
+router.get('/search', searchPosts);
+router.get('/:id', getPostById);
+
+router.post("/", authenticateToken, checkRole(['PROFESSOR']), createPost);
+router.put("/:id", authenticateToken, checkRole(['PROFESSOR']), updatePost);
+router.delete("/:id", authenticateToken, checkRole(['PROFESSOR']), deletePost);
 
 export default router;

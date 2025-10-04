@@ -71,5 +71,5 @@ function onListening() {
         originalConsoleInfo.call(console, `${green}${message}${reset}`, ...args);
     };
 
-    console.info(`Listening on http://localhost:${bind}`);
+    console.info(`Listening on http://localhost:${process.env.PORT || '3000'}`);
 }
