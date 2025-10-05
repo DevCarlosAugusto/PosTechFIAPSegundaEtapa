@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-      - dev
+      - develop
   pull_request:
     branches:
       - main
-      - dev
+      - develop
 
 jobs:
   test_and_build:
@@ -32,12 +32,9 @@ jobs:
       postgresdb:
         image: postgres:14-alpine
         env:
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}_test
+          POSTGRES_DB: postgres
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-
-        # ports:
-        #   - 5432:5432
 
         options: >
           --health-cmd pg_isready
@@ -63,4 +60,4 @@ jobs:
           sleep 10
 
       - name: Run Integration Tests (Vitest)
-        run: npm prod
+        run: npm test
