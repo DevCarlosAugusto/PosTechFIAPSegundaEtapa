@@ -33,10 +33,8 @@ jobs:
       postgres:
         image: postgres:14-alpine
         env:
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}_test
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-
         ports:
           - 5432:5432
         options: >
@@ -44,7 +42,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
