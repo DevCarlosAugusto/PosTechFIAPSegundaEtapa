@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { Client } from 'pg'; // <-- NOVO: Importe o Client do pg para a destruição
+import { Client } from 'pg';
 import dotenv from 'dotenv';
 
 import { UserSchema } from '../../entities/user.entity.js';
@@ -56,42 +56,32 @@ export async function createTables() {
     console.log('[DB INIT] Criação de tabelas (sincronização de Entities) concluída pelo TypeORM.');
 }
 
-// ---------------------------------------------------------------------
-// --- NOVO: FUNÇÃO PARA FECHAR CONEXÃO E DESTRUIR O DB DE TESTE ---
-// ---------------------------------------------------------------------
 export async function closeDatabaseConnection() {
-    // 1. Encerra a conexão do TypeORM, se estiver ativa
     if (AppDataSource && AppDataSource.isInitialized) {
         await AppDataSource.destroy();
         console.log("TypeORM DataSource encerrado.");
     }
 
-    // 2. Destruição do banco de dados de teste (Apenas se for um DB de teste)
-    // O teste só destrói se o nome do banco terminar em '_test'
     if (DATABASE_NAME && DATABASE_NAME.endsWith('_test')) {
         console.log(`[TEST DB] Tentando destruir o banco de testes: ${DATABASE_NAME}`);
 
-        // Conecta ao DB administrativo 'postgres'
         const client = new Client({
             ...PG_CONFIG,
-            database: 'postgres', // Conecta ao DB padrão para gerenciar outros DBs
+            database: 'postgres',
         });
 
         try {
             await client.connect();
 
-            // Força a desconexão de todos os usuários restantes
             await client.query(`SELECT pg_terminate_backend(pg_stat_activity.pid)
                                 FROM pg_stat_activity
                                 WHERE pg_stat_activity.datname = '${DATABASE_NAME}'
                                   AND pid <> pg_backend_pid();`);
 
-            // DROP DATABASE IF EXISTS
             await client.query(`DROP DATABASE IF EXISTS "${DATABASE_NAME}";`);
             console.log(`[TEST DB] Banco de dados "${DATABASE_NAME}" destruído após os testes.`);
         } catch (error) {
-            // Este erro é comum se o usuário não tem permissão para DROP DATABASE
-            console.error('[TEST DB] Erro ao destruir o banco de testes no final:', error.message);
+''            console.error('[TEST DB] Erro ao destruir o banco de testes no final:', error.message);
             console.warn('[TEST DB] O banco de dados de teste pode ter permanecido. Verifique as permissões do usuário PostgreSQL.');
         } finally {
             await client.end();
