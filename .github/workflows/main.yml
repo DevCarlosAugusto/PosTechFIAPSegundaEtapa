@@ -14,19 +14,19 @@ jobs:
   test_and_build:
     runs-on: ubuntu-latest
 
-    env:
-      NODE_ENV: test
-
-      POSTGRES_HOST: postgresdb
-      POSTGRES_DB: educablog
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Secure_Password_For_CI_123!
-      POSTGRES_PORT: 5432
-
-      JWT_SECRET: SEGREDO_FORTE_PARA_PRODUCAO
-      APP_PORT: 3000
-      PORT: 3000
-      ENVIRONMENT: production
+#    env:
+#      NODE_ENV: test
+#
+#      POSTGRES_HOST: postgresdb
+#      POSTGRES_DB: educablog
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: Secure_Password_For_CI_123!
+#      POSTGRES_PORT: 5432
+#
+#      JWT_SECRET: SEGREDO_FORTE_PARA_PRODUCAO
+#      APP_PORT: 3000
+#      PORT: 3000
+#      ENVIRONMENT: production
 
     services:
       postgresdb:
