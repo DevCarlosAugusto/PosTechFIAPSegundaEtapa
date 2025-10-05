@@ -1,38 +1,33 @@
-name: CI/CD com Testes e Banco de Dados
+name: CI/CD com Testes de Integração
 
 on:
   push:
     branches:
       - main
-      - dev
+      - develop
   pull_request:
     branches:
       - main
-      - dev
+      - develop
 
 jobs:
   test_and_build:
     runs-on: ubuntu-latest
 
     env:
-      APP_PORT: 3000
-      PORT: 3000
       NODE_ENV: test
-      JWT_SECRET: ci_cd_secret
-
-
-
-      ENVIRONMENT: test
-      POSTGRES_HOST: postgresdb
       POSTGRES_DB: educablog
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Secure_Password_For_CI_123!
+      POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
+      JWT_SECRET: teste_jwt_secret
 
     services:
       postgres:
         image: postgres:14-alpine
         env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}_test
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         ports:
@@ -42,6 +37,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,4 +56,4 @@ jobs:
           sleep 10
 
       - name: Run Integration Tests (Vitest)
-        run: npm prod
+        run: npm test
