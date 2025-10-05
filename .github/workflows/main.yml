@@ -31,7 +31,7 @@ jobs:
       postgres:
         image: postgres:14-alpine
         env:
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}_test
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         ports:
