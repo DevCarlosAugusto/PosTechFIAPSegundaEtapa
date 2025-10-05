@@ -17,10 +17,12 @@ jobs:
     env:
       APP_PORT: 3000
       PORT: 3000
-      NODE_ENV: production
+      NODE_ENV: test
       JWT_SECRET: ci_cd_secret
 
-      ENVIRONMENT: production
+
+
+      ENVIRONMENT: test
       POSTGRES_HOST: postgresdb
       POSTGRES_DB: educablog
       POSTGRES_USER: postgres
@@ -31,9 +33,10 @@ jobs:
       postgres:
         image: postgres:14-alpine
         env:
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}_test
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+
         ports:
           - 5432:5432
         options: >
