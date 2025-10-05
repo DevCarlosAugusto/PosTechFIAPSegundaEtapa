@@ -9,7 +9,7 @@
     "dev:watch": "npm run lint && node src/server.js",
     "jsdocs": "jsdoc /src -r",
     "lint": "eslint . --ext .js",
-    "test": "vitest",
+    "test": "dotenv -e .env -e .env.test vitest",
     "prod": "dotenv -e .env -e .env.production -- node src/server.js"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import pg from 'pg';
+import { Client } from 'pg'; // <-- NOVO: Importe o Client do pg para a destruição
 import dotenv from 'dotenv';
 
 import { UserSchema } from '../../entities/user.entity.js';
@@ -38,56 +38,63 @@ export async function initializeDatabase() {
         throw new Error("DATABASE_NAME não configurado. Verifique seus arquivos .env.");
     }
 
-    let client;
-    try {
-        console.log(`[DB INIT] Tentando conectar ao PostgreSQL em ${PG_CONFIG.host}:${PG_CONFIG.port} para verificar o DB...`);
-
-        client = new pg.Client({
-            user: PG_CONFIG.user,
-            host: PG_CONFIG.host,
-            database: 'postgres',
-            password: PG_CONFIG.password,
-            port: PG_CONFIG.port,
-        });
-
-        await client.connect();
-        console.log('[DB INIT] Conexão temporária ao PostgreSQL estabelecida.');
-
-        const res = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [DATABASE_NAME]);
-
-        if (res.rowCount === 0) {
-            console.log(`[DB INIT] Banco de dados '${DATABASE_NAME}' não encontrado. Criando...`);
-            await client.query(`CREATE DATABASE ${DATABASE_NAME}`);
-            console.log(`[DB INIT] Banco de dados '${DATABASE_NAME}' criado com sucesso.`);
-        } else {
-            console.log(`[DB INIT] Banco de dados '${DATABASE_NAME}' já existe.`);
-        }
-
-    } catch (error) {
-        console.error(`[DB INIT] ERRO FATAL na fase de verificação/criação do banco de dados: ${error.message}`);
-        throw error;
-    } finally {
-        if (client) {
-            await client.end();
-            console.log('[DB INIT] Conexão temporária ao PostgreSQL encerrada.');
-        }
+    if (AppDataSource && AppDataSource.isInitialized) {
+        console.log("TypeORM AppDataSource já está pronto.");
+        return;
     }
 
-    try {
-        AppDataSource = new DataSource(dataSourceOptions);
-        await AppDataSource.initialize();
-        console.log(`[DB INIT] TypeORM DataSource inicializado com sucesso para '${DATABASE_NAME}'.`);
-    } catch (error) {
-        console.error(`[DB INIT] ERRO FATAL ao inicializar o TypeORM DataSource: ${error.message}`);
-        throw error;
-    }
+    AppDataSource = new DataSource(dataSourceOptions);
+    await AppDataSource.initialize();
+    console.log("TypeORM AppDataSource inicializado.");
 }
 
 export async function createTables() {
     if (!AppDataSource || !AppDataSource.isInitialized) {
-        console.error('[DB INIT] ERRO: TypeORM AppDataSource não está pronto. Não é possível criar tabelas.');
         throw new Error('TypeORM AppDataSource não está pronto.');
     }
 
     console.log('[DB INIT] Criação de tabelas (sincronização de Entities) concluída pelo TypeORM.');
+}
+
+// ---------------------------------------------------------------------
+// --- NOVO: FUNÇÃO PARA FECHAR CONEXÃO E DESTRUIR O DB DE TESTE ---
+// ---------------------------------------------------------------------
+export async function closeDatabaseConnection() {
+    // 1. Encerra a conexão do TypeORM, se estiver ativa
+    if (AppDataSource && AppDataSource.isInitialized) {
+        await AppDataSource.destroy();
+        console.log("TypeORM DataSource encerrado.");
+    }
+
+    // 2. Destruição do banco de dados de teste (Apenas se for um DB de teste)
+    // O teste só destrói se o nome do banco terminar em '_test'
+    if (DATABASE_NAME && DATABASE_NAME.endsWith('_test')) {
+        console.log(`[TEST DB] Tentando destruir o banco de testes: ${DATABASE_NAME}`);
+
+        // Conecta ao DB administrativo 'postgres'
+        const client = new Client({
+            ...PG_CONFIG,
+            database: 'postgres', // Conecta ao DB padrão para gerenciar outros DBs
+        });
+
+        try {
+            await client.connect();
+
+            // Força a desconexão de todos os usuários restantes
+            await client.query(`SELECT pg_terminate_backend(pg_stat_activity.pid)
+                                FROM pg_stat_activity
+                                WHERE pg_stat_activity.datname = '${DATABASE_NAME}'
+                                  AND pid <> pg_backend_pid();`);
+
+            // DROP DATABASE IF EXISTS
+            await client.query(`DROP DATABASE IF EXISTS "${DATABASE_NAME}";`);
+            console.log(`[TEST DB] Banco de dados "${DATABASE_NAME}" destruído após os testes.`);
+        } catch (error) {
+            // Este erro é comum se o usuário não tem permissão para DROP DATABASE
+            console.error('[TEST DB] Erro ao destruir o banco de testes no final:', error.message);
+            console.warn('[TEST DB] O banco de dados de teste pode ter permanecido. Verifique as permissões do usuário PostgreSQL.');
+        } finally {
+            await client.end();
+        }
+    }
 }
