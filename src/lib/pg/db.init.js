@@ -81,7 +81,7 @@ export async function closeDatabaseConnection() {
             await client.query(`DROP DATABASE IF EXISTS "${DATABASE_NAME}";`);
             console.log(`[TEST DB] Banco de dados "${DATABASE_NAME}" destruído após os testes.`);
         } catch (error) {
-''            console.error('[TEST DB] Erro ao destruir o banco de testes no final:', error.message);
+            console.error('[TEST DB] Erro ao destruir o banco de testes no final:', error.message);
             console.warn('[TEST DB] O banco de dados de teste pode ter permanecido. Verifique as permissões do usuário PostgreSQL.');
         } finally {
             await client.end();

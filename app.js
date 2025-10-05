@@ -51,6 +51,11 @@ app.use('/posts', PostsRouter);
 app.use(ErrorController);
 
 export async function bootstrapDatabase() {
+    if (process.env.NODE_ENV === 'test') {
+        console.log('✅ Bootstrap do DB ignorado: Ambiente de teste.');
+        return;
+    }
+
     try {
         console.log('Iniciando o bootstrap do banco de dados em segundo plano...');
 

@@ -39,7 +39,7 @@ export const registerUser = async (req, res, next) => {
                 path: err.path.join('.'),
                 message: err.message,
             }));
-            return next(createError(400, 'Dados de entrada inválidos.', { errors: formattedErrors }));
+            return next(createError(400, 'Dados de entrada inválidos.', { details: formattedErrors }));
         }
 
         console.error("Erro no registro do usuário:", error.message);
