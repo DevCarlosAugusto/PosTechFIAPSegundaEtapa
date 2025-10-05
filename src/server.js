@@ -75,5 +75,5 @@ function onListening() {
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
 
-    console.log(`${green}[SERVER] Servidor ativo !\nApp rodando em http://localhost:${process.env.APP_PORT}`);
+    console.log(`${green}[SERVER] Servidor ativo !\nApp rodando em ${green}http://localhost:${process.env.APP_PORT}`);
 }
