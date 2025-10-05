@@ -32,7 +32,6 @@ export const registerUser = async (req, res, next) => {
             message: 'Usuário registrado com sucesso!',
             user: userResponse,
         });
-
     } catch (error) {
         if (error.name === 'ZodError') {
             const formattedErrors = error.errors.map(err => ({
