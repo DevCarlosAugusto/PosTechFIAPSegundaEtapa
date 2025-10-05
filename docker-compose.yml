@@ -1,75 +1,36 @@
 services:
   app:
     build: .
-    container_name: pos-tech-fiap
+    container_name: app_educa_blog
     ports:
       - "${APP_PORT}:${APP_PORT}"
     depends_on:
-      - postgres
-      # - mongo
-      # - mysql
+      postgresdb:
+        condition: service_healthy
+    env_file:
+      - .env
+      - .env.production
     environment:
-      # Variáveis de ambiente para conexão com os bancos de dados
-      # Adapte os nomes, usuários, senhas e bancos de dados conforme necessário
-      DATABASE_URL_POSTGRES: postgresql://user_pg:password_pg@postgres:5432/db_pg
-      DATABASE_URL_MONGO: mongodb://user_mongo:password_mongo@mongo:27017/db_mongo
-      DATABASE_URL_MYSQL: mysql://user_mysql:password_mysql@mysql:3306/db_mysql
+      APP_PORT: ${APP_PORT}
+      POSTGRES_HOST: postgresdb
       NODE_ENV: ${ENVIRONMENT}
-    networks:
-      - app-network
 
-  # Serviço do PostgreSQL
-  postgres:
-    image: postgres:latest
-    container_name: volume-postgresql
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+  postgresdb:
+    image: postgres:15-alpine
+    container_name: educablog_db
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-  # Serviço do MongoDB
-  # mongo:
-  #   image: mongo:latest
-  #   container_name: volume-mongodb
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-  #     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-  #   ports:
-  #     - "${MONGO_PORT}:27017"
-  #   volumes:
-  #     - mongo_data:/data/db
-  #   networks:
-  #     - app-network
-
-  # Serviço do MySQL
-  # mysql:
-  #   image: mysql:latest
-  #   container_name: volume-mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
-  #     MYSQL_USER: ${MYSQL_USER}
-  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-  #   ports:
-  #     - "${MYSQL_PORT}:3306"
-  #   volumes:
-  #     - mysql_data:/var/lib/mysql
-  #   networks:
-  #     - app-network
-
-# Definição das redes e volumes
-networks:
-  app-network:
-    driver: bridge
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+      - .env.production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
   postgres_data:
-  # mongo_data:
-  # mysql_data:

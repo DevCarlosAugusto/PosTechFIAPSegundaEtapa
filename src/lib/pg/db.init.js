@@ -10,9 +10,9 @@ export let AppDataSource = null;
 
 const PG_CONFIG = {
     user: process.env.POSTGRES_USER,
-    host: process.env.POSTGRES_HOST || 'localhost',
+    host: process.env.POSTGRES_HOST,
     password: process.env.POSTGRES_PASSWORD,
-    port: parseInt(process.env.POSTGRES_HOST || '5432', 10),
+    port: parseInt(process.env.POSTGRES_PORT || '5432', 10)
 };
 
 const dataSourceOptions = {
