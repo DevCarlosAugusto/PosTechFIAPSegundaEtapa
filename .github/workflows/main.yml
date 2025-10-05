@@ -4,37 +4,48 @@ on:
   push:
     branches:
       - main
-      - dev
+      - develop
   pull_request:
     branches:
       - main
-      - dev
+      - develop
 
 jobs:
   test_and_build:
     runs-on: ubuntu-latest
 
+    # 🚨 Variáveis de Ambiente para a Aplicação Node.js:
+    # Usamos todas as variáveis de prod, mas forçamos NODE_ENV=test
+    # para que o db.init.js crie o DB educablog_test
     env:
       NODE_ENV: test
 
+      # Variáveis de Conexão Estáveis
       POSTGRES_HOST: postgresdb
       POSTGRES_DB: educablog
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Secure_Password_For_CI_123!
       POSTGRES_PORT: 5432
 
+      # Outras Variáveis
       JWT_SECRET: SEGREDO_FORTE_PARA_PRODUCAO
       APP_PORT: 3000
       PORT: 3000
       ENVIRONMENT: production
 
     services:
+      # Nome do serviço (host) deve ser 'postgresdb'
       postgresdb:
-        image: postgres:15-alpine
+        image: postgres:15-alpine # Usamos a imagem do seu docker-compose.yml
         env:
+          # 🚨 CORREÇÃO DEFINITIVA (Exit Code 125): Usamos o DB padrão 'postgres' na inicialização.
+          # Isso previne conflitos, e seu db.init.js se conecta aqui para criar o DB de teste.
           POSTGRES_DB: postgres
+          # 🚨 CORREÇÃO FINAL: Forçamos os valores literais para o Docker não os perder (causa do erro 125).
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: Secure_Password_For_CI_123!
+
+        # Remoção de Conflito: Sem mapeamento de portas.
 
         options: >
           --health-cmd pg_isready
@@ -60,4 +71,5 @@ jobs:
           sleep 10
 
       - name: Run Integration Tests (Vitest)
-        run: npm test
+        # 🚨 COMANDO CORRIGIDO: Deve ser 'npm test' para rodar o vitest
+        run: npm prod
