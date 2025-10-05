@@ -24,7 +24,7 @@ jobs:
       POSTGRES_HOST: postgresdb
       POSTGRES_DB: educablog
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
+      POSTGRES_PASSWORD: Secure_Password_For_CI_123!
       POSTGRES_PORT: 5432
 
     services:
