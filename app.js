@@ -17,12 +17,12 @@ import ErrorController from './src/controllers/error.controller.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
 const app = express();
-let isDbReady = false;
+
+export let isDbReady = false;
 
 app.use((req, res, next) => {
-    if (isDbReady) {
+    if (process.env.NODE_ENV === 'test' || isDbReady) {
         next();
     } else {
         res.status(503).json({
@@ -50,7 +50,7 @@ app.use('/posts', PostsRouter);
 
 app.use(ErrorController);
 
-async function bootstrapDatabase() {
+export async function bootstrapDatabase() {
     try {
         console.log('Iniciando o bootstrap do banco de dados em segundo plano...');
 
@@ -60,21 +60,10 @@ async function bootstrapDatabase() {
         isDbReady = true;
         console.log('✅ Bootstrap do banco de dados concluído com sucesso. Servidor liberado para requisições.');
 
-        const green = '\x1b[38;2;129;201;149m';
-        const reset = '\x1b[0m';
-        const originalConsoleInfo = console.info;
-
-        console.info = (message, ...args) => {
-            originalConsoleInfo.call(console, `${green}${message}${reset}`, ...args);
-        };
-
-        console.info(`Listening on http://localhost:${process.env.PORT || '3000'}`);
-
     } catch (error) {
-        console.error('❌ ERRO CRÍTICO no bootstrap: Falha na inicialização do DB. O servidor permanecerá indisponível.', error);
+        console.error('❌ ERRO CRÍTICO ao iniciar o DB:', error.message);
+        process.exit(1);
     }
 }
-
-bootstrapDatabase();
 
 export default app;

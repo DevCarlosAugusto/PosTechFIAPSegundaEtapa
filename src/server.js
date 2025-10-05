@@ -1,8 +1,9 @@
 import 'reflect-metadata';
-import app from '../app.js';
 import debug from 'debug';
 import http from 'http';
 import dotenv from 'dotenv';
+
+import app, { bootstrapDatabase } from '../app.js';
 
 dotenv.config();
 
@@ -15,7 +16,17 @@ let server = http.createServer(app);
 server.on('error', onError);
 server.on('listening', onListening);
 
-server.listen(port, '0.0.0.0');
+
+async function startServer() {
+    console.log('--- Iniciando Servidor ---');
+
+    await bootstrapDatabase();
+
+    server.listen(port, '0.0.0.0');
+}
+
+startServer();
+
 
 function normalizePort(val) {
     let port = parseInt(val, 10);
@@ -57,19 +68,12 @@ function onError(error) {
 }
 
 function onListening() {
+    const green = '\x1b[38;2;129;201;149m';
     let addr = server.address();
     let bind = typeof addr === 'string'
         ? 'pipe ' + addr
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
 
-    const green = '\x1b[38;2;129;201;149m';
-    const reset = '\x1b[0m';
-    const originalConsoleInfo = console.info;
-
-    console.info = (message, ...args) => {
-        originalConsoleInfo.call(console, `${green}${message}${reset}`, ...args);
-    };
-
-    console.info(`Listening on http://localhost:${process.env.PORT || '3000'}`);
+    console.log(`${green}[SERVER] Servidor ativo !\nApp rodando em http://localhost:${process.env.APP_PORT}`);
 }
