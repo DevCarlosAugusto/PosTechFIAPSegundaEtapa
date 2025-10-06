@@ -332,7 +332,7 @@ export const deleteUser = async (req, res, next) => {
             return next(createError(404, 'Usuário não encontrado para exclusão.'));
         }
 
-        res.status(204).send();
+        res.status(204).json.send();
     } catch (error) {
         console.error("Erro ao deletar usuário:", error.message);
         next(createError(500, 'Falha interna ao deletar usuário.'));
