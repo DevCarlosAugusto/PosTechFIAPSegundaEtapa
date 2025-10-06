@@ -17,7 +17,7 @@ jobs:
     env:
       NODE_ENV: test
 
-      POSTGRES_HOST: postgresdb
+      POSTGRES_HOST: localhost
       POSTGRES_DB: educablog
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Secure_Password_For_CI_123!
@@ -28,6 +28,7 @@ jobs:
       PORT: 3000
       ENVIRONMENT: production
 
+
     services:
       postgresdb:
         image: postgres:15-alpine
@@ -35,6 +36,9 @@ jobs:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: Secure_Password_For_CI_123!
+
+        ports:
+          - 5432:5432
 
         options: '--health-cmd "pg_isready -U postgres -d postgres" --health-interval 5s --health-timeout 5s --health-retries 5 --health-start-period 10s'
 
