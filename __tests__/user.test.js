@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { describe, test, expect, afterEach, beforeAll, afterAll } from 'vitest';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 
 import app from '../app.js';
 import UserRepository from '../src/models/user.model.js';
