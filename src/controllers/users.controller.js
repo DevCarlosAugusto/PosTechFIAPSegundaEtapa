@@ -1,7 +1,6 @@
 import UserRepository, { UserCreationSchema } from '../models/user.model.js';
 import createError from 'http-errors';
 
-
 /**
  * @swagger
  * /users/register:
@@ -33,7 +32,7 @@ import createError from 'http-errors';
  *                 example: senha123
  *               serie:
  *                 type: string
- *                 description: Série do usuário ( Opcional) 
+ *                 description: Série do usuário ( Opcional)
  *                 example: 5ª série
  *               subject:
  *                 type: string
@@ -93,6 +92,7 @@ export const registerUser = async (req, res, next) => {
         next(createError(500, 'Falha interna ao registrar o usuário.'));
     }
 };
+
 
 /**
  * @swagger
@@ -175,7 +175,6 @@ export const listAllUsers = async (req, res, next) => {
  *       500:
  *         description: Falha interna ao buscar usuário.
  */
-
 /**
  * @description Lida com a busca de um usuário pelo ID. (GET /users/:id)
  * @type {RequestHandler}
@@ -199,6 +198,7 @@ export const getUserById = async (req, res, next) => {
         next(createError(500, 'Falha interna ao buscar usuário.'));
     }
 };
+
 
 /**
  * @swagger
@@ -240,7 +240,7 @@ export const getUserById = async (req, res, next) => {
  *                 example: senha1234
  *               serie:
  *                 type: string
- *                 description: Série do usuário ( Opcional) 
+ *                 description: Série do usuário ( Opcional)
  *                 example: 6ª série
  *               subject:
  *                 type: string
@@ -256,7 +256,6 @@ export const getUserById = async (req, res, next) => {
  *       500:
  *         description: Erro interno no servidor
  */
-
 /**
  * @description Lida com a atualização de um usuário pelo ID. (PUT /users/:id)
  * @description Implementação simplificada: requer validação Zod adicional para updates se necessário.
@@ -291,6 +290,7 @@ export const updateUser = async (req, res, next) => {
         next(createError(500, 'Falha interna ao atualizar usuário.'));
     }
 };
+
 /**
  * @swagger
  * /users/{id}:
@@ -316,7 +316,6 @@ export const updateUser = async (req, res, next) => {
  *       500:
  *         description: Falha interna ao deletar usuário.
  */
-
 /**
  * @description Lida com a remoção de um usuário pelo ID. (DELETE /users/:id)
  * @type {RequestHandler}
@@ -332,7 +331,7 @@ export const deleteUser = async (req, res, next) => {
             return next(createError(404, 'Usuário não encontrado para exclusão.'));
         }
 
-        res.status(204).json.send();
+        res.status(204).send();
     } catch (error) {
         console.error("Erro ao deletar usuário:", error.message);
         next(createError(500, 'Falha interna ao deletar usuário.'));
