@@ -13,6 +13,37 @@ const formatZodErrors = (error) => {
 };
 
 /**
+ * @swagger
+ * /posts:
+ *   post:
+ *     summary: Cria um novo post
+ *     tags: [Posts]
+ *     security:
+ *      - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Título do post
+ *                 example: Meu primeiro post
+ *               content:
+ *                 type: string
+ *                 description: Conteúdo do post
+ *                 example: Este é o conteúdo do post
+ *     responses:
+ *       201:
+ *         description: Post criado com sucesso.
+ *       400:
+ *         description: Dados de entrada inválidos.
+ *       500:
+ *         description: Falha interna ao criar o post.
+ */
+/**
  * @description Lida com a criação de um novo post. (POST /posts)
  * @type {RequestHandler}
  */
@@ -37,6 +68,31 @@ export const createPost = async (req, res, next) => {
 };
 
 /**
+ * @swagger
+ * /posts:
+ *   get:
+ *     summary: Lista todos os posts
+ *     tags: [Posts]
+ *     responses:
+ *       200:
+ *         description: Lista de posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       500:
+ *         description: Falha interna ao buscar posts.
+ */
+/**
  * @description Lida com a listagem de todos os posts. (GET /posts)
  * @type {RequestHandler}
  */
@@ -50,6 +106,29 @@ export const getAllPosts = async (req, res, next) => {
     }
 };
 
+/**
+ * @swagger
+ * /posts/{id}:
+ *   get:
+ *     summary: Busca um post pelo ID
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do post
+ *     responses:
+ *       200:
+ *         description: Post encontrado.
+ *       400:
+ *         description: ID de post inválido.
+ *       404:
+ *         description: Post não encontrado.
+ *       500:
+ *         description: Falha interna ao buscar o post.
+ */
 /**
  * @description Lida com a busca de um post pelo ID. (GET /posts/:id)
  * @type {RequestHandler}
@@ -72,6 +151,46 @@ export const getPostById = async (req, res, next) => {
     }
 };
 
+/**
+ * @swagger
+ * /posts/{id}:
+ *   put:
+ *     summary: Atualiza um post pelo ID
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do post
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Título Updated do post
+ *                 example: Meu primeiro post Updated
+ *               content:
+ *                 type: string
+ *                 description: Conteúdo Updated do post
+ *                 example: Este é o conteúdo Updated do post
+ *     responses:
+ *       200:
+ *         description: Post atualizado com sucesso
+ *       400:
+ *         description: ID de post inválido.
+ *       404:
+ *         description: Post não encontrado para atualização.
+ *       500:
+ *         description: Falha interna ao atualizar o post.
+ */
 /**
  * @description Lida com a atualização de um post pelo ID. (PUT /posts/:id)
  * @type {RequestHandler}
@@ -104,6 +223,31 @@ export const updatePost = async (req, res, next) => {
 };
 
 /**
+ * @swagger
+ * /posts/{id}:
+ *   delete:
+ *     summary: Remove um post pelo ID
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do post
+ *     responses:
+ *       204:
+ *         description: Post removido com sucesso.
+ *       400:
+ *         description: ID de post inválido.
+ *       404:
+ *         description: Post não encontrado para exclusão.
+ *       500:
+ *         description: Falha interna ao deletar o post.
+ */
+/**
  * @description Lida com a remoção de um post pelo ID. (DELETE /posts/:id)
  * @type {RequestHandler}
  */
@@ -125,6 +269,40 @@ export const deletePost = async (req, res, next) => {
     }
 };
 
+/**
+ * @swagger
+ * /posts/search:
+ *   get:
+ *     summary: Busca posts por palavra-chave
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: query
+ *         name: termo
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Palavra-chave para busca
+ *     responses:
+ *       200:
+ *         description: Resultados da busca
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *       400:
+ *         description: Parâmetro de busca ausente ou inválido
+ *       500:
+ *         description: Erro interno no servidor
+ */
 /**
  * @description Lida com a busca de posts por palavra-chave. (GET /posts/search?termo=...)
  * @type {RequestHandler}

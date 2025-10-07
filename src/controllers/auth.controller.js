@@ -5,6 +5,57 @@ import UserRepository from '../models/user.model.js';
 const SECRET = process.env.JWT_SECRET || 'segredo-super-secreto';
 
 /**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Realiza o login de um usuário.
+ *     description: Autentica um usuário com email e senha, retornando um token JWT.
+ *     tags:
+ *       - Autenticação
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: O email do usuário.
+ *                 example: usuario.exemplo@email.com
+ *               password:
+ *                 type: string
+ *                 description: A senha do usuário.
+ *                 example: senha123
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT gerado para autenticação.
+ *                 user_type:
+ *                   type: string
+ *                   description: Tipo do usuário.
+ *                 id:
+ *                   type: integer
+ *                   description: ID do usuário.
+ *                 nome:
+ *                   type: string
+ *                   description: Nome do usuário.
+ *       400:
+ *         description: Requisição inválida (email ou senha ausentes).
+ *       401:
+ *         description: Credenciais inválidas.
+ *       500:
+ *         description: Erro interno no servidor.
+ */
+
+/**
  * @typedef {import('express').RequestHandler} RequestHandler
  */
 
