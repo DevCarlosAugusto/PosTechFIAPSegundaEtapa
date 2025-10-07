@@ -17,7 +17,7 @@ jobs:
     env:
       NODE_ENV: test
 
-      POSTGRES_HOST: postgresdb
+      POSTGRES_HOST: localhost
       POSTGRES_DB: educablog
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Secure_Password_For_CI_123!
@@ -28,6 +28,7 @@ jobs:
       PORT: 3000
       ENVIRONMENT: production
 
+
     services:
       postgresdb:
         image: postgres:15-alpine
@@ -36,12 +37,10 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: Secure_Password_For_CI_123!
 
-        options: >
-          --health-cmd "pg_isready -U postgres -d postgres" 
-          --health-interval 5s 
-          --health-timeout 5s 
-          --health-retries 5 
-          --health-start-period 10s
+        ports:
+          - 5432:5432
+
+        options: '--health-cmd "pg_isready -U postgres -d postgres" --health-interval 5s --health-timeout 5s --health-retries 5 --health-start-period 10s'
 
     steps:
       - name: Checkout code
@@ -58,7 +57,7 @@ jobs:
       - name: Wait for PostgreSQL to be ready
         run: |
           echo "Aguardando 10s para o Postgres iniciar..."
-          sleep 10
+          sleep 25
 
       - name: Run Integration Tests (Vitest)
         run: npm test
