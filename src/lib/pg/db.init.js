@@ -17,6 +17,34 @@ const PG_CONFIG = {
     port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
 };
 
+async function createDatabaseIfNotExists(dbName) {
+    const client = new Client({
+        ...PG_CONFIG,
+        database: 'postgres',
+    });
+
+    try {
+        await client.connect();
+
+        const res = await client.query(`SELECT 1 FROM pg_database WHERE datname = $1`, [dbName]);
+
+        if (res.rows.length === 0) {
+            console.log(`[DB INIT] Banco de dados "${dbName}" não encontrado. Criando...`);
+
+            await client.query(`CREATE DATABASE "${dbName}"`);
+
+            console.log(`[DB INIT] Banco de dados "${dbName}" criado com sucesso.`);
+        } else {
+            console.log(`[DB INIT] Banco de dados "${dbName}" já existe. Conectando...`);
+        }
+    } catch (error) {
+        console.error('[DB INIT] ERRO CRÍTICO ao criar/verificar o banco de dados:', error.message);
+        throw error;
+    } finally {
+        await client.end();
+    }
+}
+
 const dataSourceOptions = {
     type: 'postgres',
     host: PG_CONFIG.host,
@@ -33,9 +61,13 @@ const dataSourceOptions = {
 };
 
 export async function initializeDatabase() {
-    if (!DATABASE_NAME || DATABASE_NAME.endsWith('_test') && !process.env.POSTGRES_DB) {
+    if (!DATABASE_NAME || (DATABASE_NAME.endsWith('_test') && !process.env.POSTGRES_DB)) {
         console.error("[DB INIT] ERRO: A variável de ambiente POSTGRES_DB não está definida.");
         throw new Error("DATABASE_NAME não configurado. Verifique seus arquivos .env.");
+    }
+
+    if (process.env.ENVIRONMENT !== 'production') {
+        await createDatabaseIfNotExists(DATABASE_NAME);
     }
 
     if (AppDataSource && AppDataSource.isInitialized) {
