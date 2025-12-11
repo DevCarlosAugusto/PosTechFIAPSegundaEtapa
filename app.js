@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import cors from 'cors';
 
 import { initializeDatabase, createTables } from './src/lib/pg/db.init.js';
 
@@ -18,6 +19,14 @@ import ErrorController from './src/controllers/error.controller.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
+
+// Configuração do CORS
+app.use(cors({
+  origin: "http://localhost:3001",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 
 export let isDbReady = false;
 
